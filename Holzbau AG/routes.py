@@ -23,7 +23,7 @@ def home():
 @bp.route('/customer-data', methods=['GET', 'POST'], endpoint='customer_data_route')
 def customer_data():
     # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv')
+    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv') # change in file path neccessary!
 
     if request.method == 'POST':
         action = request.form.get('action')
