@@ -20,3 +20,21 @@ def write_dataframe_to_csv(dataframe, filename):
 # data = read_csv_to_dataframe('your_csv_file.csv')
 # Modify data as needed using pandas operations
 # write_dataframe_to_csv(data, 'your_csv_file_updated.csv')
+
+
+import pandas as pd
+
+def find_highest_order_id(csv_file_path):
+    # Read the CSV file into a DataFrame
+    df = pd.read_csv(csv_file_path)
+
+    # Check if the 'Order_ID' column exists
+    if 'Order_ID' in df.columns:
+        # Find the highest 'Order_ID'
+        highest_order_id = df['Order_ID'].max()
+
+        return highest_order_id
+
+    else:
+        # If 'Order_ID' column doesn't exist, return None or handle accordingly
+        return None

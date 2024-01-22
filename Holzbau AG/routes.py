@@ -1,6 +1,6 @@
 import csv
 from flask import Blueprint, render_template, request, redirect, url_for
-from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv
+from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv, find_highest_order_id
 import logging
 from datetime import datetime
 
@@ -23,7 +23,7 @@ def home():
 @bp.route('/customer-data', methods=['GET', 'POST'], endpoint='customer_data_route')
 def customer_data():
     # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv') # change in file path neccessary!
+    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv')
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -179,3 +179,137 @@ def save_edited_row():
         return redirect(url_for('holzbauag.order_data_route'))
 
     return redirect(url_for('holzbauag.order_data_route'))
+
+from flask import render_template
+
+@bp.route('/add-data', methods=['GET', 'POST'])
+def add_data():
+    # Assuming you have a CSV file named 'order_data.csv'
+    file_path = '/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv'
+
+    # Find the Order_ID with the highest value
+    highest_order_id = find_highest_order_id(file_path)
+
+    # Read CSV using the function from the pandas module
+    order_data = read_csv_to_dataframe(file_path)
+
+    # Automatically find the highest Order_ID and increment by 1
+    highest_order_id = order_data['Order_ID'].astype(int).max() + 1 if not order_data.empty else 1
+
+    if request.method == 'POST':
+        # Extract data from the form
+        order_id = request.form.get('Order_ID')
+        date = request.form.get('date')
+        customer_id = request.form.get('customer_id')
+        price = request.form.get('price')
+        chair = request.form.get('chair')
+        stool = request.form.get('stool')
+        table = request.form.get('table')
+        cabinet = request.form.get('cabinet')
+        couch = request.form.get('couch')
+        bed = request.form.get('bed')
+        shelf = request.form.get('shelf')
+
+        # Check if any field has an input of None
+        if None in (order_id, date, customer_id, price, chair, stool, table, cabinet, couch, bed, shelf):
+            missing_fields = [field for field, value in {'Order ID': order_id, 'Date': date, 'Customer ID': customer_id, 'Price': price, 'Chair': chair, 'Stool': stool, 'Table': table, 'Cabinet': cabinet, 'Couch': couch, 'Bed': bed, 'Shelf': shelf}.items() if value is None]
+            return render_template('add_order_row.html', title='Add Data', missing_fields=missing_fields, highest_order_id=highest_order_id)
+
+        # Convert numeric fields to their respective types
+        price = float(price)
+        chair = int(chair)
+        stool = int(stool)
+        table = int(table)
+        cabinet = int(cabinet)
+        couch = int(couch)
+        bed = int(bed)
+        shelf = int(shelf)
+
+        # Create a dictionary with the extracted data
+        new_data = {
+            'Order_ID': highest_order_id,
+            'Date': date,
+            'Customer_ID': customer_id,
+            'Price': float(price),
+            'Chair': int(chair),
+            'Stool': int(stool),
+            'Table': int(table),
+            'Cabinet': int(cabinet),
+            'Couch': int(couch),
+            'Bed': int(bed),
+            'Shelf': int(shelf)
+        }
+
+        # Append the new_data to the DataFrame
+        order_data = order_data.append(new_data, ignore_index=True)
+
+        # Save the updated DataFrame to CSV
+        write_dataframe_to_csv(order_data, file_path)
+
+        # Redirect to the order_data_route after adding data
+        return redirect(url_for('holzbauag.order_data_route'))
+
+    # Render the page for adding data with the highest Order_ID + 1
+    return render_template('add_order_row.html', title='Add Data', highest_order_id=highest_order_id)
+
+
+@bp.route('/save-new-row', methods=['POST'])
+def save_new_row():
+    # Read CSV using pandas
+    order_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+
+    if request.method == 'POST':
+        # Extract data from the form
+        order_id = request.form.get('order_id')
+        date = request.form.get('date')
+        customer_id = request.form.get('customer_id')
+        price = request.form.get('price')
+        chair = request.form.get('chair')
+        stool = request.form.get('stool')
+        table = request.form.get('table')
+        cabinet = request.form.get('cabinet')
+        couch = request.form.get('couch')
+        bed = request.form.get('bed')
+        shelf = request.form.get('shelf')
+
+        # Check if any field has an input of None
+        if None in (order_id, date, customer_id, ...):  # Add other fields as needed
+            missing_fields = [field for field, value in {'Order ID': order_id, 'Date': date, 'Customer ID': customer_id, 'Price': price, 'Chair': chair, 'Stool': stool, 'Table': table, 'Cabinet': cabinet, 'Couch': couch, 'Bed': bed, 'Shelf': shelf}.items() if value is None]
+            return render_template('add_order_row.html', title='Add Data', missing_fields=missing_fields)
+
+        # Convert numeric fields to their respective types
+        price = float(price)
+        chair = int(chair)
+        stool = int(stool)
+        table = int(table)
+        cabinet = int(cabinet)
+        couch = int(couch)
+        bed = int(bed)
+        shelf = int(shelf)
+
+        # Create a dictionary with the extracted data
+        new_data = {
+            'Order_ID': order_id,
+            'Date': date,
+            'Customer_ID': customer_id,
+            'Price': price,
+            'Chair': chair,
+            'Stool': stool,
+            'Table': table,
+            'Cabinet': cabinet,
+            'Couch': couch,
+            'Bed': bed,
+            'Shelf': shelf
+        }
+
+        # Append the new_data to the DataFrame
+        order_data = order_data.append(new_data, ignore_index=True)
+
+        # Save the updated DataFrame to CSV
+        write_dataframe_to_csv(order_data, '/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+
+        # Redirect to the order_data_route after adding data
+        return redirect(url_for('holzbauag.order_data_route'))
+
+    # Handle other cases if needed
+    return render_template('error.html', error_message='Invalid request')

@@ -50,10 +50,17 @@
     </nav>
     <h1>{{ title }}</h1>
 <!-- Edit Selected Button -->
-<form method="post" action="{{ url_for('holzbauag.edit_selected_row') }}">
-    <button type="submit" name="action" value="edit">Edit Selected</button>
-    
+    <form method="post" action="{{ url_for('holzbauag.edit_selected_row') }}">
+        <button type="submit" name="action" value="edit">Edit Selected</button>
+    </form>
+
+    <!-- Add Data Button -->
+    <form method="get" action="{{ url_for('holzbauag.add_data') }}">
+        <button type="submit">Add Data</button>
+    </form>
+
     {% if not data.empty %}
+    <!-- Display of the data in a table-->
         <table border="1">
             <thead>
                 {% for key in data.columns %}
