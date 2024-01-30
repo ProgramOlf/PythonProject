@@ -1,8 +1,9 @@
 import csv
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for , render_template_string
 from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv, find_highest_order_id
 import logging
 from datetime import datetime
+from visualizations import generate_sales_over_time_chart, generate_furniture_distribution_chart
 
 
 bp = Blueprint('holzbauag', __name__)
@@ -17,13 +18,16 @@ def read_csv(filename):
 
 @bp.route('/')
 def home():
-    return render_template('index.html', title='HolzbauAG', content='Welcome to HolzbauAG!')
+    visualizations_url = url_for('holzbauag.visualizations_route')
+    return render_template('index.html', title='HolzbauAG', content='Welcome to HolzbauAG!', visualizations_url=visualizations_url)
+
+
 
 
 @bp.route('/customer-data', methods=['GET', 'POST'], endpoint='customer_data_route')
 def customer_data():
     # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv')
+    customer_data = read_csv_to_dataframe('customer_data.csv')
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -44,14 +48,14 @@ def customer_data():
 
             # Redirect or render the appropriate page.
             return redirect(url_for('holzbauag.customer_data_route'))
-
+        
     return render_template('customer_data.html', title='Customer Data', data=customer_data)
 
 
 @bp.route('/edit-customer-row', methods=['POST'], endpoint='edit_customer_row')
 def edit_customer_row():
     # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv')
+    customer_data = read_csv_to_dataframe('customer_data.csv')
 
     # Replace this with your logic to get the selected row index
     customer_row_index = request.form.get('selected_row_id', type=int)
@@ -74,10 +78,11 @@ def edit_customer_row():
 
     return render_template('edit_customer_row.html', title='Edit Row', customer_row_index=customer_row_index, column_names=column_names, customer_row_data=customer_row_data)
 
+
 @bp.route('/save-customer-edited-row', methods=['POST'])
 def save_customer_edited_row():
     # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv')
+    customer_data = read_csv_to_dataframe('customer_data.csv')
 
     if request.method == 'POST':
         customer_row_index = int(request.form.get('customer_row_index'))
@@ -93,7 +98,7 @@ def save_customer_edited_row():
                 customer_data.at[customer_row_index, key] = request.form.get(key)
 
         # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(customer_data, '/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/customer_data.csv')
+        write_dataframe_to_csv(customer_data, 'customer_data.csv')
 
         return redirect(url_for('holzbauag.customer_data_route'))
 
@@ -103,7 +108,7 @@ def save_customer_edited_row():
 @bp.route('/order-data', methods=['GET', 'POST'], endpoint='order_data_route')
 def order_data():
     # Read CSV using pandas
-    order_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+    order_data = read_csv_to_dataframe('order_data.csv')
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -131,7 +136,7 @@ def order_data():
 @bp.route('/edit-selected-row', methods=['POST'], endpoint='edit_selected_row')
 def edit_selected_row():
     # Read CSV using pandas
-    order_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+    order_data = read_csv_to_dataframe('order_data.csv')
 
     # Replace this with your logic to get the selected row index
     selected_row_index = request.form.get('selected_row_id', type=int)
@@ -158,7 +163,7 @@ def edit_selected_row():
 @bp.route('/save-edited-row', methods=['POST'])
 def save_edited_row():
     # Read CSV using pandas
-    order_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+    order_data = read_csv_to_dataframe('order_data.csv')
 
     if request.method == 'POST':
         selected_row_index = int(request.form.get('selected_row_index'))
@@ -174,7 +179,7 @@ def save_edited_row():
                 order_data.at[selected_row_index, key] = request.form.get(key)
 
         # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(order_data, '/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+        write_dataframe_to_csv(order_data, 'order_data.csv')
 
         return redirect(url_for('holzbauag.order_data_route'))
 
@@ -185,7 +190,7 @@ from flask import render_template
 @bp.route('/add-data', methods=['GET', 'POST'])
 def add_data():
     # Assuming you have a CSV file named 'order_data.csv'
-    file_path = '/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv'
+    file_path = 'order_data.csv'
 
     # Find the Order_ID with the highest value
     highest_order_id = find_highest_order_id(file_path)
@@ -256,7 +261,7 @@ def add_data():
 @bp.route('/save-new-row', methods=['POST'])
 def save_new_row():
     # Read CSV using pandas
-    order_data = read_csv_to_dataframe('/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+    order_data = read_csv_to_dataframe('order_data.csv')
 
     if request.method == 'POST':
         # Extract data from the form
@@ -306,10 +311,33 @@ def save_new_row():
         order_data = order_data.append(new_data, ignore_index=True)
 
         # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(order_data, '/Users/florianbadura/Desktop/PythonProject/Holzbau AG/data/order_data.csv')
+        write_dataframe_to_csv(order_data, 'order_data.csv')
 
         # Redirect to the order_data_route after adding data
         return redirect(url_for('holzbauag.order_data_route'))
 
     # Handle other cases if needed
     return render_template('error.html', error_message='Invalid request')
+
+
+
+
+
+@bp.route('/visualizations', methods=['GET'],endpoint='visualizations_route' )
+def visualizations():
+    # Generate visualizations
+    sales_over_time_chart = generate_sales_over_time_chart()
+    furniture_distribution_chart = generate_furniture_distribution_chart()
+
+    # Render the template with the charts
+    return render_template('visualizations.html', title='Visualizations', 
+                           sales_over_time_chart=sales_over_time_chart, 
+                           furniture_distribution_chart=furniture_distribution_chart)
+
+    
+    
+    
+    
+    
+    
+   
