@@ -334,10 +334,158 @@ def visualizations():
                            sales_over_time_chart=sales_over_time_chart, 
                            furniture_distribution_chart=furniture_distribution_chart)
 
+# Task 5
+# 8 Marketing campaigns for Holzbau GmbH have been created to activate the customer basis
+# 5.1 New Years Marketing Campaign
+# Read customer data
+customer_data = pd.read_csv('customer_data.csv')
+
+# Extract customer IDs of all customers
+all_customer_ids = customer_data['Customer_ID'].unique()
+
+# Send marketing email to all customers
+for customer_id in all_customer_ids:
+    print(f"Sending marketing email to customer ID {customer_id}:")
+    print("Happy New Year from Holzbau!\nStart the year off right with our exclusive New Year's discount event.\nEnjoy up to 30% off on our stylish furniture collections and elevate your home decor for a fresh start in 2024\n")
     
-    
-    
-    
-    
+
+# 5.2 Spring Marketing Campaign
+import pandas as pd
+# Read customer data
+customer_data = pd.read_csv('customer_data.csv')
+
+# Extract customer IDs of all customers
+all_customer_ids = customer_data['Customer_ID'].unique()
+
+# Send marketing email to all customers
+for customer_id in all_customer_ids:
+    print(f"Sending marketing email to customer ID {customer_id}:")
+    print("Super spring savings are here!\nComplete your dream home makeover today! Explore our wide selection of stylish furniture pieces at unbeatable prices. Don't miss out – shop now and elevate your living space with comfort and elegance. Use code SPRING24 at checkout for a 30% discount.\n")
+ 
+
+# 5.3 Special Marketing Strategies per Country
+# 5.3.1 USA Marketing Campaign
+
+import pandas as pd
+
+# Load customer data from CSV file
+customer_data = pd.read_csv('customer_data.csv')
+
+# Filter customers from the USA
+usa_customers = customer_data[customer_data['Country'] == 'USA']
+
+# Print the 4th of July sale message for USA customers
+for index, customer in usa_customers.iterrows():
+    print("Deck out your home in style this Fourth of July with our spectacular sale at Holzbau GmbH! Celebrate Independence Day with huge discounts on a wide range of furniture, from cozy couches to elegant dining tables. Don't miss this chance to create an inviting space for your family and friends to gather and celebrate! Use code 4JULY at checkout. Happy Shopping!")
+
+
+# 5.3.2 France Marketing Campaign
+import pandas as pd
+
+# Load customer data from CSV file
+customer_data = pd.read_csv('customer_data.csv')
+
+# Filter customers from the USA
+usa_customers = customer_data[customer_data['Country'] == 'France']
+
+# Print the Bastille day sale message for French customers
+for index, customer in usa_customers.iterrows():
+    print("Celebrate Bastille day with us!\nEnjoy 30% off on all our furniture to make your home even more beautiful.\nOffer valid only for our customers in France - don't miss out on this special occasion!\n")
+
+# 5.4 Holzbau GmbH's Birthday Marketing Campaign
+
+import pandas as pd
+
+# Read customer data
+customer_data = pd.read_csv('customer_data.csv')
+
+# Extract customer IDs of all customers
+all_customer_ids = customer_data['Customer_ID'].unique()
+
+# Send marketing email to all customers
+for customer_id in all_customer_ids:
+    print(f"Sending marketing email to customer ID {customer_id}:")
+    print("Join us in celebrating Holzbau GmbH's 20th anniversary!\nTo mark this milestone, we're offering an exclusive 20% discount on all furniture items.\nDon't miss out on this opportunity to spruce up your home with quality pieces at unbeatable prices.\n")
+ 
+# 5.5 Black Friday Marketing Campaign
+
+import pandas as pd
+
+# Read customer data
+customer_data = pd.read_csv('customer_data.csv')
+
+# Extract customer IDs of all customers
+all_customer_ids = customer_data['Customer_ID'].unique()
+
+# Send marketing email to all customers
+for customer_id in all_customer_ids:
+    print(f"Sending marketing email to customer ID {customer_id}:")
+    print("Black Friday week at Holzbau GmbH\nUnlock unbeatable savings this Black Friday week at Holzbau GmbH!\nFrom luxurious couches to sleek dining sets, indulge in our exclusive discounts and elevate your home decor.\nHurry, seize the opportunity to transform your living space into a haven of style and comfort at prices you won't believe. Up to 50% off. Shop the sale\n")
+
+# 5.6 Christmas Marketing Campaign
+# Read customer data
+customer_data = pd.read_csv('customer_data.csv')
+
+# Extract customer IDs of all customers
+all_customer_ids = customer_data['Customer_ID'].unique()
+
+# Send marketing email to all customers
+for customer_id in all_customer_ids:
+    print(f"Sending marketing email to customer ID {customer_id}:")
+    print("Christmas Sale\nAs the holiday season draws near, we at Holzbau are thrilled to invite you to elevate your festive celebrations with our exquisite furniture offerings.\nFrom cozy sofas to elegant dining sets, we have everything you need to transform your home into a winter wonderland of comfort and style.\nThis Christmas, give the gift of luxury and warmth with our curated selection of timeless pieces.\nWhether you're hosting a grand feast or cozying up by the fireplace, our furniture is designed to create unforgettable moments with your loved ones.\nAs a token of our appreciation for your continued support, we're delighted to offer you an exclusive discount code: XMASJOY20. Use it at checkout to enjoy extra savings on your holiday purchases.\nVisit our website or drop by our showroom to explore our enchanting collection and discover the perfect pieces to make your holiday season truly magical.\n")
+
+# 5.7 Customer Loyalty Marketing Campaign (Email 2 months after their last purchase) 
+
+# 5.8 Customers Sign-Up Birthday Marketing Campaign
+
+# Task 6
+import csv
+
+# Understand purchase history
+def read_purchase_history(order_data_file):
+    purchase_history = {}
+    with open(order_data_file, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            Customer_ID = row['Customer_ID']
+            purchase_info = {key: int(value) for key, value in row.items() if key != 'Customer ID' and key != 'Date'}
+            purchase_history[Customer_ID] = purchase_info
+    return purchase_history
+
+# Recommendations for their next purchase
+def recommend_next_purchase(purchase_history):
+    recommendations = {}
+    for Customer_ID, purchases in purchase_history.items():
+        chair_count = purchases.get('Chair', 0)
+        stool_count = purchases.get('Stool', 0)
+        table_count = purchases.get('Table', 0)
+        cabinet_count = purchases.get('Cabinet', 0)
+        dresser_count = purchases.get('Dresser', 0)
+        couch_count = purchases.get('Couche', 0)
+        bed_count = purchases.get('Bed', 0)
+        shelf_count = purchases.get('Shelf', 0)
+
+        if chair_count > 2:
+            recommendations[Customer_ID] = "You've purchased more than 2 chairs. Consider adding a table to complete your dining set."
+        elif stool_count > 1:
+            recommendations[Customer_ID] = "You've purchased more than 1 stool. Adding another stool or a table could enhance your space."
+        elif bed_count > 0 and dresser_count == 0:
+            recommendations[Customer_ID] = "You've purchased a bed but no dresser. A dresser could complement your bedroom setup."
+        elif couch_count > 0 and table_count == 0:
+            recommendations[Customer_ID] = "You've purchased a couch but no table. Consider adding a coffee table to complete your living room ensemble."
+        else:
+            recommendations[Customer_ID] = "Based on your purchase history, we recommend exploring our wide range of furniture pieces to find your next perfect addition."
+    return recommendations
+
+# Purchase history and recommendations
+order_data_file = 'order_data.csv'
+purchase_history = read_purchase_history(order_data_file)
+recommendations = recommend_next_purchase(purchase_history)
+
+# Print recommendations for each customer
+for Customer_ID, recommendation in recommendations.items():
+    print(f"Customer ID: {Customer_ID}")
+    print(f"Recommendation: {recommendation}\n")
+
     
    
