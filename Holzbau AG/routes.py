@@ -3,7 +3,8 @@ from flask import Blueprint, render_template, request, redirect, url_for , rende
 from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv, find_highest_order_id
 import logging
 from datetime import datetime
-from visualizations import generate_sales_over_time_chart, generate_furniture_distribution_chart
+from visualizations import generate_sales_over_time_chart, generate_furniture_distribution_chart,generate_customer_country_chart,generate_customer_age_chart
+import pandas as pd
 
 
 bp = Blueprint('holzbauag', __name__)
@@ -328,12 +329,18 @@ def visualizations():
     # Generate visualizations
     sales_over_time_chart = generate_sales_over_time_chart()
     furniture_distribution_chart = generate_furniture_distribution_chart()
-
+    customer_country_chart = generate_customer_country_chart()
+    customer_age_chart = generate_customer_age_chart()
     # Render the template with the charts
-    return render_template('visualizations.html', title='Visualizations', 
+    return render_template('visualizations.html', title='Visualizations',
+                           customer_country_chart = customer_country_chart,
+                           customer_age_chart = customer_age_chart,
                            sales_over_time_chart=sales_over_time_chart, 
                            furniture_distribution_chart=furniture_distribution_chart)
 
+
+    
+'''
 # Task 5
 # 8 Marketing campaigns for Holzbau GmbH have been created to activate the customer basis
 # 5.1 New Years Marketing Campaign
@@ -487,5 +494,5 @@ for Customer_ID, recommendation in recommendations.items():
     print(f"Customer ID: {Customer_ID}")
     print(f"Recommendation: {recommendation}\n")
 
-    
+ '''   
    
