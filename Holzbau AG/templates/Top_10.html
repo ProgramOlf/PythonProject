@@ -39,6 +39,25 @@
         form input {
             margin: 5px;
         }
+         table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -50,56 +69,79 @@
         <a href="/visualizations">Visualizations</a>
         <!-- Add more navigation links as needed -->
     </nav>
-    <h1>{{ title }}</h1>
-<!-- Edit Selected Button -->
-    <form method="post" action="{{ url_for('holzbauag.edit_selected_row') }}">
-        <button type="submit" name="action" value="edit">Edit Selected</button>
-    </form>
 
-    <!-- Add Data Button -->
-    <form method="get" action="{{ url_for('holzbauag.add_data') }}">
-        <button type="submit">Add Data</button>
-    </form>
+<h1>{{ title }}</h1>
+<div>
+    <h2>Top Customer Orders Information</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Total Products</th>
+        </tr>
+        {% for customer in top_customer_orders_info %}
+        <tr>
+            <td>{{ customer.Customer_ID }}</td>
+            <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+            <td>{{ customer.Total_Products }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+        <br> <br> <br><br>
 
-    {% if not data.empty %}
-    <!-- Display of the data in a table-->
-        <table border="1">
-            <thead>
-                {% for key in data.columns %}
-                    <th>{{ key }}</th>
-                {% endfor %}
-                <th>Action</th>
-            </thead>
-            <tbody>
-                {% for index, row in data.iterrows() %}
-                    <tr>
-                        {% for value in row %}
-                            <td>{{ value }}</td>
-                        {% endfor %}
-                        <td>
-                            <input type="radio" name="selected_row_id" value="{{ index }}">
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No data available</p>
-    {% endif %}
 
-    <!-- Add a hidden field to capture selected row ID -->
-    <input type="hidden" name="selected_row_id">
-</form>
-    <!-- Edit Form -->
-    <form method="post" action="{{ url_for('holzbauag.order_data_route') }}">
-        {% if selected_row_id %}
-            <h2>Edit Data for Row ID: {{ selected_row_id }}</h2>
-            {% for key in data.columns %}
-                <label for="{{ key }}">{{ key }}:</label>
-                <input type="text" name="{{ key }}" value="{{ data.loc[selected_row_id, key] }}"><br>
-            {% endfor %}
-            <button type="submit" name="action" value="save_edit">Save Edit</button>
-        {% endif %}
-    </form>
+    <h2>Top Customer Spending Information</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Total Spending</th>
+        </tr>
+        {% for customer in top_customer_spending_info %}
+        <tr>
+            <td>{{ customer.Customer_ID }}</td>
+            <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+            <td>{{ customer.Total_Spending }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br> <br> <br><br>
+
+
+    <h2>Top 10 Customers Based on Products Bought</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Total Products</th>
+        </tr>
+        {% for customer in top_10_customers_products %}
+        <tr>
+            <td>{{ customer.Customer_ID }}</td>
+            <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+            <td>{{ customer.Total_Products }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+        <br> <br> <br><br>
+    <h2>Top 10 Customers Based on Money Spent</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Total Spending</th>
+        </tr>
+        {% for customer in top_10_customers_money %}
+        <tr>
+            <td>{{ customer.Customer_ID }}</td>
+            <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+            <td>{{ customer.Total_Spending }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br> <br> <br><br>
+</div>
+
 </body>
-</html>

@@ -20,7 +20,7 @@ def read_csv(filename):
 @bp.route('/')
 def home():
     visualizations_url = url_for('holzbauag.visualizations_route')
-    return render_template('index.html', title='HolzbauAG', content='Welcome to HolzbauAG!', visualizations_url=visualizations_url)
+    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!', visualizations_url=visualizations_url)
 
 
 
@@ -339,7 +339,46 @@ def visualizations():
                            furniture_distribution_chart=furniture_distribution_chart)
 
 
-    
+
+@bp.route('/top_10/', methods=['GET', 'POST'])
+def top_customer():
+    file_path_1 = 'order_data.csv'
+    file_path_2 = 'customer_data.csv'
+
+    order_csv = read_csv_to_dataframe(file_path_1)
+    customer_csv = read_csv_to_dataframe(file_path_2)
+
+    merged_df = pd.merge(order_csv, customer_csv, on='Customer_ID')
+    merged_df['Total_Products'] = merged_df[['Chair', 'Stool', 'Table', 'Cabinet', 'Dresser', 'Couch', 'Bed', 'Shelf']].sum(axis=1)
+
+    customer_id_column = merged_df.columns[merged_df.columns.str.contains('Customer_ID')].tolist()
+    if not customer_id_column:
+        raise ValueError("Customer ID column not found in the DataFrame.")
+
+    top_10_products = merged_df.groupby(customer_id_column)['Total_Products'].sum().nlargest(10).reset_index(name='Total_Products')
+    top_10_money = merged_df.groupby(customer_id_column)['Price'].sum().nlargest(10).reset_index(name='Total_Spending')
+
+    most_orders_customer_id = merged_df.groupby(customer_id_column)['Total_Products'].sum().idxmax()
+    most_spending_customer_id = merged_df.groupby(customer_id_column)['Price'].sum().idxmax()
+
+    top_customer_orders_info = customer_csv.loc[customer_csv[customer_id_column[0]] == most_orders_customer_id].copy()
+    top_customer_orders_info.loc[:, 'Total_Products'] = merged_df.loc[merged_df[customer_id_column[0]] == most_orders_customer_id, 'Total_Products'].sum()
+
+    top_customer_spending_info = customer_csv.loc[customer_csv[customer_id_column[0]] == most_spending_customer_id].copy()
+    top_customer_spending_info.loc[:, 'Total_Spending'] = merged_df.loc[merged_df[customer_id_column[0]] == most_spending_customer_id, 'Price'].sum()
+
+    top_10_customers_products = pd.merge(top_10_products, customer_csv, on='Customer_ID').sort_values(by='Total_Products', ascending=False)
+    top_10_customers_money = pd.merge(top_10_money, customer_csv, on='Customer_ID').sort_values(by='Total_Spending', ascending=False)
+
+    return render_template('top_10.html',
+                           title='Top Customer',
+                           top_customer_orders_info=top_customer_orders_info.to_dict(orient='records'),
+                           top_customer_spending_info=top_customer_spending_info.to_dict(orient='records'),
+                           top_10_customers_products=top_10_customers_products.to_dict(orient='records'),
+                           top_10_customers_money=top_10_customers_money.to_dict(orient='records'))
+
+
+
 '''
 # Task 5
 # 8 Marketing campaigns for Holzbau GmbH have been created to activate the customer basis
