@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Customer Data Page {% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+<!-- Edit Selected Button -->
+<form method="post" action="{{ url_for('holzbauag.edit_customer_row') }}">
+    <button type="submit" name="action" value="edit">Edit Selected</button>
+
+    {% if not data.empty %}
+        <table border="1">
+            <thead>
+                {% for key in data.columns %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+                <th>Action</th>
+            </thead>
+            <tbody>
+                {% for index, row in data.iterrows() %}
+                    <tr>
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                        <td>
+                            <input type="radio" name="selected_row_id" value="{{ index }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No data available</p>
+    {% endif %}
+    
+    <!-- Add a hidden field to capture selected row ID -->
+    <input type="hidden" name="selected_row_id">
+</form>
+
+<!-- Edit Form -->
+<form method="post" action="{{ url_for('holzbauag.save_customer_edited_row') }}">
+    {% if selected_row_id %}
+        <h2>Edit Data for Row ID: {{ selected_row_id }}</h2>
+        {% for key in data.columns %}
+            <label for="{{ key }}">{{ key }}:</label>
+            <input type="text" name="{{ key }}" value="{{ data.loc[selected_row_id, key] }}"><br>
+        {% endfor %}
+        <input type="hidden" name="selected_row_id" value="{{ selected_row_id }}">
+        <button type="submit" name="action" value="save_edit">Save Edit</button>
+    {% endif %}
+</form>
+{% endblock %}

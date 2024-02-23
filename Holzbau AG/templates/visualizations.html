@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %} Visualizations Page {% endblock%}
+
+{% block content %}
+        <h1>{{ title }}</h1>
+
+    <section>
+        <h2>Countries our customers are from</h2>
+        <img src="data:image/png;base64,{{ customer_country_chart }}" alt="Countries">
+    </section>
+	
+    <section>
+        <h2>Age distribution of our customers</h2>
+        <img src="data:image/png;base64,{{ customer_age_chart }}" alt="Age Distribution">
+    </section>
+
+    <section>
+        <h2>Yearly Aggregates Sales</h2>
+        <img src="data:image/png;base64,{{ sales_over_time_chart }}" alt="Yearly Sales">
+    </section>
+
+    <section>
+        <h2>Furniture Distribution</h2>
+        <img src="data:image/png;base64,{{ furniture_distribution_chart }}" alt="Furniture Distribution">
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Holzbau AG. All rights reserved.</p>
+    </footer>
+{% endblock %}
