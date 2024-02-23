@@ -55,7 +55,7 @@ def generate_customer_country_chart():
     customer_data = read_csv_to_dataframe('customer_data.csv')
     country_counts = customer_data['Country'].value_counts()
     plt.figure(figsize=(8, 6))
-    plt.pie(country_counts, labels=country_counts.index, autopct='%1.1f%%', startangle=140, colors = ['#FFD1DC', '#FFA07A', '#CCCCCC', '#FFDEAD', '#B0E0E6', '#98FB98'])
+    plt.pie(country_counts, labels=country_counts.index, autopct='%1.1f%%', startangle=140, colors = ['#9551CB', '#FFA07A', '#CCCCCC', '#FFDEAD', '#B0E0E6', '#98FB98','#E5F125'])
     plt.title('Country Distribution')
     plt.axis('equal')  
     

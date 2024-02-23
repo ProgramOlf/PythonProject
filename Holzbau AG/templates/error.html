@@ -1,78 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
-    <style>
-        /* Add some basic styling for the navigation bar */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+{% extends "base.html" %}
 
-        nav {
-            background-color: #333;
-            overflow: hidden;
-            margin-bottom: 20px; /* Add margin between navigation bar and content */
-            width: 100%;
-        }
+{% block title %} Error {% endblock%}
 
-        nav a {
-            float: left;
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        nav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .error-container {
-            text-align: center;
-            margin-top: 50px; /* Adjust the top margin for the error message */
-        }
-
-        h1 {
-            color: red;
-            font-size: 24px; /* Adjust the font size for the error text */
-        }
-
-        .back-button {
-            display: inline-block;
-            padding: 10px;
-            margin-top: 20px; /* Adjust the top margin for the back button */
-            text-decoration: none;
-            background-color: #555; /* Different color for the back button */
-            color: white;
-        }
-
-        .back-button:hover {
-            background-color: #777;
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/customer-data">Customer Data</a>
-        <a href="/order-data">Order Data</a>
-        <!-- Add more navigation links as needed -->
-    </nav>
-    
+{% block content %}
     <div class="error-container">
-        <h1>Error</h1>
+        <h2>Error</h2>
         <p>{{ error_message }}</p>
     </div>
 
     <a href="javascript:history.go(-1)" class="back-button">Back</a>
-</body>
-</html>
+{% endblock %}

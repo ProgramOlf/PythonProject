@@ -1,61 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            color: #333;
-            line-height: 1.6;
-        }
+{% extends "base.html" %}
 
-        header {
-            background-color: #007bff;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
+{% block title %} Visualizations Page {% endblock%}
 
-        h1, h2 {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        img {
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            height: auto;
-        }
-
-        section {
-            margin: 20px auto;
-            max-width: 800px;
-            padding: 0 20px;
-        }
-
-        footer {
-            background-color: #007bff;
-            color: #fff;
-            padding: 5px;
-            text-align: right;
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            width: 150px;
-        }
-    </style>
-</head>
-<body>
-    <header>
+{% block content %}
         <h1>{{ title }}</h1>
-    </header>
 
     <section>
         <h2>Countries our customers are from</h2>
@@ -80,5 +28,4 @@
     <footer>
         <p>&copy; 2024 Holzbau AG. All rights reserved.</p>
     </footer>
-</body>
-</html>
+{% endblock %}
