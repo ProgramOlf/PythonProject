@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %} Visualizations Page {% endblock%}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <div>
+        <h2>Top Customer Orders Information</h2>
+        <table>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Total Products</th>
+            </tr>
+            {% for customer in top_customer_orders_info %}
+            <tr>
+                <td>{{ customer.Customer_ID }}</td>
+                <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+                <td>{{ customer.Total_Products }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+            <br> <br> <br><br>
+
+
+        <h2>Top Customer Spending Information</h2>
+        <table>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Total Spending</th>
+            </tr>
+            {% for customer in top_customer_spending_info %}
+            <tr>
+                <td>{{ customer.Customer_ID }}</td>
+                <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+                <td>{{ customer.Total_Spending }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br> <br> <br><br>
+
+
+        <h2>Top 10 Customers Based on Products Bought</h2>
+        <table>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Total Products</th>
+            </tr>
+            {% for customer in top_10_customers_products %}
+            <tr>
+                <td>{{ customer.Customer_ID }}</td>
+                <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+                <td>{{ customer.Total_Products }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+
+            <br> <br> <br><br>
+        <h2>Top 10 Customers Based on Money Spent</h2>
+        <table>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Total Spending</th>
+            </tr>
+            {% for customer in top_10_customers_money %}
+            <tr>
+                <td>{{ customer.Customer_ID }}</td>
+                <td>{{ customer.Customer_First_Name }} {{ customer.Customer_Last_Name }}</td>
+                <td>{{ customer.Total_Spending }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br> <br> <br><br>
+    </div>
+{% endblock %}
