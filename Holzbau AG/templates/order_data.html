@@ -41,7 +41,7 @@
     {% endif %}
 
     <!-- Add a hidden field to capture selected row ID -->
-    <input type="hidden" name="selected_row_id">
+    <input type="hidden" name="selected_row_id" value="{{ index }}">
 </form>
     <!-- Edit Form -->
     <form method="post" action="{{ url_for('holzbauag.order_data_route') }}">
