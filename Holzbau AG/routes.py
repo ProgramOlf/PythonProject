@@ -5,9 +5,32 @@ import logging
 from datetime import datetime
 from visualizations import generate_sales_over_time_chart, generate_furniture_distribution_chart,generate_customer_country_chart,generate_customer_age_chart
 import pandas as pd
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, IntegerField, FloatField, DateField
+from wtforms.validators import DataRequired
+
+
 
 
 bp = Blueprint('holzbauag', __name__)
+
+
+
+# Create a Class to implement new Order Data
+class OrderForm(FlaskForm):
+    order_id = IntegerField('Order_ID', validators=[DataRequired()])
+    date = DateField('Date', validators=[DataRequired()])
+    customer_id = IntegerField('Customer_ID', validators=[DataRequired()])
+    price = FloatField ('Price', validators=[DataRequired()])
+    chair = IntegerField('Chair', validators=[DataRequired()])
+    stool = IntegerField('Stool', validators=[DataRequired()])
+    table = IntegerField ('Table', validators=[DataRequired()])
+    cabinet = IntegerField ('Cabinet', validators=[DataRequired()])
+    dresser = IntegerField('Dresser', validators=[DataRequired()])
+    couch = IntegerField('Couch', validators=[DataRequired()])
+    shelf = IntegerField('Shelf', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
 
 
 def read_csv(filename):
@@ -17,10 +40,11 @@ def read_csv(filename):
     return data
 
 
+
+
 @bp.route('/')
 def home():
-    visualizations_url = url_for('holzbauag.visualizations_route')
-    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!', visualizations_url=visualizations_url)
+    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!')
 
 
 
@@ -53,7 +77,9 @@ def customer_data():
     return render_template('customer_data.html', title='Customer Data', data=customer_data)
 
 
-@bp.route('/edit-customer-row', methods=['POST'], endpoint='edit_customer_row')
+
+
+@bp.route('/edit-customer-row', methods=['GET','POST'], endpoint='edit_customer_row')
 def edit_customer_row():
     # Read CSV using pandas
     customer_data = read_csv_to_dataframe('customer_data.csv')
@@ -78,6 +104,8 @@ def edit_customer_row():
     logging.debug(f'Selected Row Data: {customer_row_data}')
 
     return render_template('edit_customer_row.html', title='Edit Row', customer_row_index=customer_row_index, column_names=column_names, customer_row_data=customer_row_data)
+
+
 
 
 @bp.route('/save-customer-edited-row', methods=['POST'])
@@ -106,10 +134,54 @@ def save_customer_edited_row():
     return redirect(url_for('holzbauag.customer_data_route'))
 
 
+
+
 @bp.route('/order-data', methods=['GET', 'POST'], endpoint='order_data_route')
 def order_data():
     # Read CSV using pandas
     order_data = read_csv_to_dataframe('order_data.csv')
+
+    # Find the highest order number and expands it by one
+    highest_order_id = order_data['Order_ID'].astype(int).max() + 1 if not order_data.empty else 1
+
+    # Implements the form into the page
+    order_id = highest_order_id
+    date = None
+    customer_id = None
+    price = None
+    chair = None
+    stool = None
+    table = None
+    cabinet = None
+    dresser = None
+    couch = None
+    shelf = None
+    form = OrderForm()
+
+    # Validates the form to be not none
+    if form.validate_on_submit():
+        order_id = form.order_id.data
+        form.order_id.data = ''
+        date = form.date.data
+        form.date.data = ''
+        customer_id = form.customer_id.data
+        form.customer_id.data = ''
+        price = form.price.data
+        form.price.data = ''
+        chair = form.chair.data
+        form.chair.data = ''
+        stool = form.stool.data
+        form.stool.data = ''
+        table = form.table.data
+        form.table.data = ''
+        dresser = form.dresser.data
+        form.dresser.data = ''
+        couch = form.couch.data
+        form.couch.data = ''
+        shelf = form.shelf.data
+        form.shelf.data = ''
+        
+
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -131,7 +203,23 @@ def order_data():
             # Redirect or render the appropriate page.
             return redirect(url_for('holzbauag.order_data_route'))
 
-    return render_template('order_data.html', title='Order Data', data=order_data)
+    return render_template('order_data.html', 
+                           title='Order Data', 
+                           data=order_data,
+                           order_id = order_id,
+                           date = date,
+                           customer_id = customer_id,
+                           price = price,
+                           chair = chair,
+                           stool = stool,
+                           table = table,
+                           cabinet = cabinet,
+                           dresser = dresser,
+                           couch = couch,
+                           shelf = shelf,
+                           form = form)
+
+
 
 
 @bp.route('/edit-selected-row', methods=['POST'], endpoint='edit_selected_row')
@@ -161,6 +249,8 @@ def edit_selected_row():
     return render_template('edit_selected_row.html', title='Edit Row', selected_row_index=selected_row_index, column_names=column_names, selected_row_data=selected_row_data)
 
 
+
+
 @bp.route('/save-edited-row', methods=['POST'])
 def save_edited_row():
     # Read CSV using pandas
@@ -185,141 +275,6 @@ def save_edited_row():
         return redirect(url_for('holzbauag.order_data_route'))
 
     return redirect(url_for('holzbauag.order_data_route'))
-
-from flask import render_template
-
-@bp.route('/add-data', methods=['GET', 'POST'])
-def add_data():
-    # Assuming you have a CSV file named 'order_data.csv'
-    file_path = 'order_data.csv'
-
-    # Find the Order_ID with the highest value
-    highest_order_id = find_highest_order_id(file_path)
-
-    # Read CSV using the function from the pandas module
-    order_data = read_csv_to_dataframe(file_path)
-
-    # Automatically find the highest Order_ID and increment by 1
-    highest_order_id = order_data['Order_ID'].astype(int).max() + 1 if not order_data.empty else 1
-
-    if request.method == 'POST':
-        # Extract data from the form
-        order_id = request.form.get('Order_ID')
-        date = request.form.get('date')
-        customer_id = request.form.get('customer_id')
-        price = request.form.get('price')
-        chair = request.form.get('chair')
-        stool = request.form.get('stool')
-        table = request.form.get('table')
-        cabinet = request.form.get('cabinet')
-        couch = request.form.get('couch')
-        bed = request.form.get('bed')
-        shelf = request.form.get('shelf')
-
-        # Check if any field has an input of None
-        if None in (order_id, date, customer_id, price, chair, stool, table, cabinet, couch, bed, shelf):
-            missing_fields = [field for field, value in {'Order ID': order_id, 'Date': date, 'Customer ID': customer_id, 'Price': price, 'Chair': chair, 'Stool': stool, 'Table': table, 'Cabinet': cabinet, 'Couch': couch, 'Bed': bed, 'Shelf': shelf}.items() if value is None]
-            return render_template('add_order_row.html', title='Add Data', missing_fields=missing_fields, highest_order_id=highest_order_id)
-
-        # Convert numeric fields to their respective types
-        price = float(price)
-        chair = int(chair)
-        stool = int(stool)
-        table = int(table)
-        cabinet = int(cabinet)
-        couch = int(couch)
-        bed = int(bed)
-        shelf = int(shelf)
-
-        # Create a dictionary with the extracted data
-        new_data = {
-            'Order_ID': highest_order_id,
-            'Date': date,
-            'Customer_ID': customer_id,
-            'Price': float(price),
-            'Chair': int(chair),
-            'Stool': int(stool),
-            'Table': int(table),
-            'Cabinet': int(cabinet),
-            'Couch': int(couch),
-            'Bed': int(bed),
-            'Shelf': int(shelf)
-        }
-
-        # Append the new_data to the DataFrame
-        order_data = order_data.append(new_data, ignore_index=True)
-
-        # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(order_data, file_path)
-
-        # Redirect to the order_data_route after adding data
-        return redirect(url_for('holzbauag.order_data_route'))
-
-    # Render the page for adding data with the highest Order_ID + 1
-    return render_template('add_order_row.html', title='Add Data', highest_order_id=highest_order_id)
-
-
-@bp.route('/save-new-row', methods=['POST'])
-def save_new_row():
-    # Read CSV using pandas
-    order_data = read_csv_to_dataframe('order_data.csv')
-
-    if request.method == 'POST':
-        # Extract data from the form
-        order_id = request.form.get('order_id')
-        date = request.form.get('date')
-        customer_id = request.form.get('customer_id')
-        price = request.form.get('price')
-        chair = request.form.get('chair')
-        stool = request.form.get('stool')
-        table = request.form.get('table')
-        cabinet = request.form.get('cabinet')
-        couch = request.form.get('couch')
-        bed = request.form.get('bed')
-        shelf = request.form.get('shelf')
-
-        # Check if any field has an input of None
-        if None in (order_id, date, customer_id, ...):  # Add other fields as needed
-            missing_fields = [field for field, value in {'Order ID': order_id, 'Date': date, 'Customer ID': customer_id, 'Price': price, 'Chair': chair, 'Stool': stool, 'Table': table, 'Cabinet': cabinet, 'Couch': couch, 'Bed': bed, 'Shelf': shelf}.items() if value is None]
-            return render_template('add_order_row.html', title='Add Data', missing_fields=missing_fields)
-
-        # Convert numeric fields to their respective types
-        price = float(price)
-        chair = int(chair)
-        stool = int(stool)
-        table = int(table)
-        cabinet = int(cabinet)
-        couch = int(couch)
-        bed = int(bed)
-        shelf = int(shelf)
-
-        # Create a dictionary with the extracted data
-        new_data = {
-            'Order_ID': order_id,
-            'Date': date,
-            'Customer_ID': customer_id,
-            'Price': price,
-            'Chair': chair,
-            'Stool': stool,
-            'Table': table,
-            'Cabinet': cabinet,
-            'Couch': couch,
-            'Bed': bed,
-            'Shelf': shelf
-        }
-
-        # Append the new_data to the DataFrame
-        order_data = order_data.append(new_data, ignore_index=True)
-
-        # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(order_data, 'order_data.csv')
-
-        # Redirect to the order_data_route after adding data
-        return redirect(url_for('holzbauag.order_data_route'))
-
-    # Handle other cases if needed
-    return render_template('error.html', error_message='Invalid request')
-
 
 
 

@@ -4,15 +4,37 @@
 
 {% block content %}
     <h1>{{ title }}</h1>
+<!-- Add Data Form -->
+    <h2>Add Order Data</h2>
+    <form method="post">
+        {{ form.order_id.label }}
+        {{ form.order_id() }}
+        {{ form.date.label }}
+        {{ form.date() }}
+        {{ form.customer_id.label }}
+        {{ form.customer_id() }}
+        {{ form.price.label }}
+        {{ form.price() }}
+        {{ form.chair.label }}
+        {{ form.stool() }}
+        {{ form.table.label }}
+        {{ form.table() }}
+        {{ form.cabinet.label }}
+        {{ form.cabinet() }}
+        {{ form.dresser.label }}
+        {{ form.dresser() }}
+        {{ form.couch.label }}
+        {{ form.couch() }}
+        {{ form.shelf.label }}
+        {{ form.shelf() }}
+        <br/>
+        {{ form.submit() }}
+        <br/>
+
 <!-- Edit Selected Button -->
     <form method="post" action="{{ url_for('holzbauag.edit_selected_row') }}">
         <button type="submit" name="action" value="edit">Edit Selected</button>
-    </form>
-
-    <!-- Add Data Button -->
-    <form method="get" action="{{ url_for('holzbauag.add_data') }}">
-        <button type="submit">Add Data</button>
-    </form>
+        <br/>
 
     {% if not data.empty %}
     <!-- Display of the data in a table-->
