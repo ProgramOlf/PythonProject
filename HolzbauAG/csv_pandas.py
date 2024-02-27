@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+import sqlalchemy
+
 
 def read_csv_to_dataframe(filename):
     try:
@@ -22,7 +24,6 @@ def write_dataframe_to_csv(dataframe, filename):
 # write_dataframe_to_csv(data, 'your_csv_file_updated.csv')
 
 
-import pandas as pd
 
 def find_highest_order_id(csv_file_path):
     # Read the CSV file into a DataFrame

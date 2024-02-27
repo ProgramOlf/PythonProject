@@ -1,5 +1,5 @@
 import csv
-from flask import Blueprint, render_template, request, redirect, url_for , render_template_string
+from flask import Blueprint, render_template, request, redirect, url_for , render_template_string, flash
 from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv, find_highest_order_id
 import logging
 from datetime import datetime
@@ -8,6 +8,10 @@ import pandas as pd
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, FloatField, DateField
 from wtforms.validators import DataRequired
+from __init__ import db
+from models import Order, Customer
+
+
 
 
 
@@ -18,18 +22,20 @@ bp = Blueprint('holzbauag', __name__)
 
 # Create a Class to implement new Order Data
 class OrderForm(FlaskForm):
-    order_id = IntegerField('Order_ID', validators=[DataRequired()])
-    date = DateField('Date', validators=[DataRequired()])
-    customer_id = IntegerField('Customer_ID', validators=[DataRequired()])
-    price = FloatField ('Price', validators=[DataRequired()])
-    chair = IntegerField('Chair', validators=[DataRequired()])
-    stool = IntegerField('Stool', validators=[DataRequired()])
-    table = IntegerField ('Table', validators=[DataRequired()])
-    cabinet = IntegerField ('Cabinet', validators=[DataRequired()])
-    dresser = IntegerField('Dresser', validators=[DataRequired()])
-    couch = IntegerField('Couch', validators=[DataRequired()])
-    shelf = IntegerField('Shelf', validators=[DataRequired()])
+    Order_ID = IntegerField('Order_ID', validators=[DataRequired()])
+    Date = DateField('Date', validators=[DataRequired()])
+    Customer_ID = IntegerField('Customer_ID', validators=[DataRequired()])
+    Price = FloatField('Price', validators=[DataRequired()])
+    Chair = IntegerField('Chair', validators=[DataRequired()])
+    Stool = IntegerField('Stool', validators=[DataRequired()])
+    Table = IntegerField('Table', validators=[DataRequired()])
+    Cabinet = IntegerField('Cabinet', validators=[DataRequired()])
+    Dresser = IntegerField('Dresser', validators=[DataRequired()])
+    Couch = IntegerField('Couch', validators=[DataRequired()])
+    Bed = IntegerField('Bed', validators=[DataRequired()])
+    Shelf = IntegerField('Shelf', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
 
 
 
@@ -45,6 +51,92 @@ def read_csv(filename):
 @bp.route('/')
 def home():
     return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!')
+
+
+
+
+
+@bp.route('/order_data2', methods=['GET', 'POST'])
+def order_data2():
+    form = OrderForm()
+
+    # Query the database to find the highest order_id
+    highest_order_id = db.session.query(db.func.max(Order.Order_ID)).scalar() or 0
+    
+    # Increment the highest order_id by one and pass it to the form
+    form.Order_ID.data = highest_order_id + 1
+    
+    if form.validate_on_submit():
+        try:
+            # Print form data for debugging
+            print("Form data:")
+            print(form.Order_ID.data)
+            print(form.Date.data)
+            print(form.Customer_ID.data)
+            print(form.Price.data)
+            print(form.Chair.data)
+            print(form.Stool.data)
+            print(form.Table.data)
+            print(form.Cabinet.data)
+            print(form.Dresser.data)
+            print(form.Couch.data)
+            print(form.Bed.data)
+            print(form.Shelf.data)
+
+            # Create a new Order instance and add it to the database
+            new_order = Order(
+                Order_ID=form.Order_ID.data, 
+                Date=form.Date.data, 
+                Customer_ID=form.Customer_ID.data, 
+                Price=form.Price.data,
+                Chair=form.Chair.data,
+                Stool=form.Stool.data,
+                Table=form.Table.data,
+                Cabinet=form.Cabinet.data,
+                Dresser=form.Dresser.data,
+                Couch=form.Couch.data,
+                Bed=form.Bed.data,
+                Shelf=form.Shelf.data,
+            )
+            
+            db.session.add(new_order)
+            db.session.commit()
+
+            # Clear form data
+            form.Order_ID.data = highest_order_id + 1  # Increment order ID again
+            form.Date.data = ''
+            form.Customer_ID.data = ''
+            form.Price.data = ''
+            form.Chair.data = ''
+            form.Stool.data = ''
+            form.Table.data = ''
+            form.Cabinet.data = ''
+            form.Dresser.data = ''
+            form.Couch.data = ''
+            form.Bed.data = ''
+            form.Shelf.data = ''
+
+            # Display a flash message to indicate successful order submission
+            flash('Order added successfully!', 'success')
+
+            # Redirect to the order_data2 route to clear the form
+            return redirect(url_for('holzbauag.order_data2'))
+        except Exception as e:
+            print(f"Error adding order: {e}")
+    else:
+        print(form.errors)
+        flash('Form validation failed!', 'error')
+
+    # Retrieve data from the order_data table
+    order_data = Order.query.order_by(Order.Order_ID)
+    print(order_data)  # Check if orders are retrieved
+    
+    return render_template('order_data2.html', 
+                           title='Order Data', 
+                           form=form,
+                           order_data=order_data)
+
+
 
 
 
@@ -295,7 +387,7 @@ def visualizations():
 
 
 
-@bp.route('/top_10/', methods=['GET', 'POST'])
+@bp.route('/Top_10/', methods=['GET', 'POST'])
 def top_customer():
     file_path_1 = 'order_data.csv'
     file_path_2 = 'customer_data.csv'
@@ -325,7 +417,7 @@ def top_customer():
     top_10_customers_products = pd.merge(top_10_products, customer_csv, on='Customer_ID').sort_values(by='Total_Products', ascending=False)
     top_10_customers_money = pd.merge(top_10_money, customer_csv, on='Customer_ID').sort_values(by='Total_Spending', ascending=False)
 
-    return render_template('top_10.html',
+    return render_template('Top_10.html',
                            title='Top Customer',
                            top_customer_orders_info=top_customer_orders_info.to_dict(orient='records'),
                            top_customer_spending_info=top_customer_spending_info.to_dict(orient='records'),
@@ -462,7 +554,7 @@ def recommend_next_purchase(purchase_history):
         table_count = purchases.get('Table', 0)
         cabinet_count = purchases.get('Cabinet', 0)
         dresser_count = purchases.get('Dresser', 0)
-        couch_count = purchases.get('Couche', 0)
+        couch_count = purchases.get('Couch', 0)
         bed_count = purchases.get('Bed', 0)
         shelf_count = purchases.get('Shelf', 0)
 

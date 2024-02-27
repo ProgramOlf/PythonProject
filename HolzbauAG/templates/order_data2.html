@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %} Order Data Page {% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <!-- Add Data Form -->
+    <h2>Add Order Data</h2>
+    <form method="post">
+        {{ form.csrf_token }}
+        {{ form.Order_ID.label }}
+        {{ form.Order_ID() }}
+        {{ form.Date.label }}
+        {{ form.Date() }}
+        {{ form.Customer_ID.label }}
+        {{ form.Customer_ID() }}
+        {{ form.Price.label }}
+        {{ form.Price() }}
+        {{ form.Chair.label }}
+        {{ form.Chair() }}
+        {{ form.Stool.label }}
+        {{ form.Stool() }}
+        {{ form.Table.label }}
+        {{ form.Table() }}
+        {{ form.Cabinet.label }}
+        {{ form.Cabinet() }}
+        {{ form.Dresser.label }}
+        {{ form.Dresser() }}
+        {{ form.Couch.label }}
+        {{ form.Couch() }}
+        {{ form.Bed.label }}
+        {{ form.Bed() }}
+        {{ form.Shelf.label }}
+        {{ form.Shelf() }}
+        <br/>
+        {{ form.submit() }}
+        <br/>
+    </form>
+    
+    <!-- Display order_data table -->
+    <h2>Order Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer ID</th>
+                <th>Price</th>
+                <th>Chair</th>
+                <th>Stool</th>
+                <th>Table</th>
+                <th>Cabinet</th>
+                <th>Dresser</th>
+                <th>Couch</th>
+                <th>Bed</th>
+                <th>Shelf</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in order_data %}
+            <tr>
+                <td>{{ order.Order_ID }}</td>
+                <td>{{ order.Date }}</td>
+                <td>{{ order.Customer_ID }}</td>
+                <td>{{ order.Price }}</td>
+                <td>{{ order.Chair }}</td>
+                <td>{{ order.Stool }}</td>
+                <td>{{ order.Table }}</td>
+                <td>{{ order.Cabinet }}</td>
+                <td>{{ order.Dresser }}</td>
+                <td>{{ order.Couch }}</td>
+                <td>{{ order.Bed }}</td>
+                <td>{{ order.Shelf }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
