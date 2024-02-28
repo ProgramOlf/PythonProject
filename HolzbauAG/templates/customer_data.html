@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Customer Data Page{% endblock %}
+{% block title %}
+    Customer Data Page
+{% endblock %}
 
 {% block content %}
-<h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
-    <!-- Button to add new order data -->
-    <a href="{{ url_for('holzbauag.add_customer_data') }}" class="btn btn-dark">Add Customer Data</a>
-    <!-- Display order_data table -->
+    <h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
+    <!-- Display customer_data table -->
     <div class="container mt-5">
-        <table class="table">
-            <thead>
+        <table class="table table-hover table-sm">
+            <thead class="thead-light">
                 <tr>
                     <th>Customer ID</th>
                     <th>First Name</th>
@@ -21,6 +21,11 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Empty row for add data button -->
+                <tr>
+                    <td colspan="5"></td> <!-- span across all columns -->
+                    <td><a href="{{ url_for('holzbauag.add_customer_data') }}" class="btn btn-outline-success btn-sm">Add Data</a></td>
+                </tr>
                 {% for customer in customer_data %}
                 <tr>
                     <td>{{ customer.Customer_ID }}</td>
@@ -28,11 +33,15 @@
                     <td>{{ customer.Customer_Last_Name }}</td>
                     <td>{{ customer.Age }}</td>
                     <td>{{ customer.Country }}</td>
-                    <td><a href="/edit_customer/{{ customer.Customer_ID }}">Edit</a></td>
+                    <td><a href="/edit_customer/{{ customer.Customer_ID }}" class="btn btn-outline-dark btn-sm">Edit</a></td>
                     <!-- Add other table data as needed -->
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <footer>
+        <p>&copy; 2024 Holzbau AG. All rights reserved.</p>
+    </footer>
 {% endblock %}
+
