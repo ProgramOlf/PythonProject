@@ -7,7 +7,7 @@
 {% block content %}
 <h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
     <!-- Button to add new order data -->
-    <a href="{{ url_for('holzbauag.add_order_data') }}" class="btn btn-primary">Add Order Data</a>
+    <a href="{{ url_for('holzbauag.add_order_data') }}" class="btn btn-dark">Add Order Data</a>
     <!-- Display order_data table -->
     <div class="container mt-5">
         <table class="table">
@@ -25,6 +25,7 @@
                     <th>Couch</th>
                     <th>Bed</th>
                     <th>Shelf</th>
+                    <th>Edit Data</th>
                     <!-- Add other table headers as needed -->
                 </tr>
             </thead>

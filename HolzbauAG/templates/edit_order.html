@@ -64,9 +64,9 @@
                         <input type="text" id="Shelf" name="Shelf" class="form-control" value="{{ order.Shelf }}">
                     </div>
                     <br/>
-                    <button type="submit" class="btn btn-primary"onclick="return confirm('Are you sure you want to edit this order?')">Submit</button>
+                    <button type="submit" class="btn btn-dark"onclick="return confirm('Are you sure you want to edit this order?')">Submit</button>
                     <a href="/delete_order/{{ order.Order_ID }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this order?')">Delete Order</a>
-                    <a href="javascript:history.go(-1)" class="btn btn-primary back-button">Back</a>
+                    <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
                 </div>
             </div>
         </div>
