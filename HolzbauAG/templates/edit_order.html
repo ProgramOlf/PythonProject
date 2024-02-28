@@ -47,52 +47,49 @@
                 </div>
 
                 <!-- Product Fields -->
+                <!-- Additional Fields -->
                 <div class="form-row">
                     <div class="col-md-6">
+                        <!-- Chair Field -->
                         <div class="form-group">
                             <label for="Chair">Chair</label>
-                            <input type="text" id="Chair" name="Chair" class="form-control" value="{{ order.Chair }}">
+                            <input type="text" id="Chair" name="Chair" class="form-control" value="{{ form.Chair.data }}">
+                            {% for error in form.Chair.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
+
+                        <!-- Stool Field -->
                         <div class="form-group">
                             <label for="Stool">Stool</label>
-                            <input type="text" id="Stool" name="Stool" class="form-control" value="{{ order.Stool }}">
+                            <input type="text" id="Stool" name="Stool" class="form-control" value="{{ form.Stool.data }}">
+                            {% for error in form.Stool.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
                     </div>
+
                     <div class="col-md-6">
+                        <!-- Table Field -->
                         <div class="form-group">
                             <label for="Table">Table</label>
-                            <input type="text" id="Table" name="Table" class="form-control" value="{{ order.Table }}">
+                            <input type="text" id="Table" name="Table" class="form-control" value="{{ form.Table.data }}">
+                            {% for error in form.Table.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
+
+                        <!-- Cabinet Field -->
                         <div class="form-group">
                             <label for="Cabinet">Cabinet</label>
-                            <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ order.Cabinet }}">
+                            <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ form.Cabinet.data }}">
+                            {% for error in form.Cabinet.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
 
-                <!-- Additional Product Fields -->
-                <div class="form-row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="Dresser">Dresser</label>
-                            <input type="text" id="Dresser" name="Dresser" class="form-control" value="{{ order.Dresser }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="Couch">Couch</label>
-                            <input type="text" id="Couch" name="Couch" class="form-control" value="{{ order.Couch }}">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="Bed">Bed</label>
-                            <input type="text" id="Bed" name="Bed" class="form-control" value="{{ order.Bed }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="Shelf">Shelf</label>
-                            <input type="text" id="Shelf" name="Shelf" class="form-control" value="{{ order.Shelf }}">
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Buttons -->
                 <div class="form-row justify-content-center">

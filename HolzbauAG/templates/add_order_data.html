@@ -25,7 +25,7 @@
                 <!-- Date Field -->
                 <div class="form-group">
                     <label for="Date">Date</label>
-                    <input type="text" id="Date" name="Date" class="form-control" value="{{ form.Date.data }}">
+                    <input type="text" id="Date" name="Date" class="form-control" placeholder="YYYY-MM-DD" value="{% if form.Date.data %}{{ form.Date.data }}{% endif %}">
                     {% for error in form.Date.errors %}
                     <div class="text-danger">{{ error }}</div>
                     {% endfor %}
