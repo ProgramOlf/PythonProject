@@ -8,7 +8,6 @@ class Customer(db.Model):
     Customer_ID = db.Column(db.Integer, primary_key=True)
     Customer_First_Name = db.Column(db.String(50), nullable=False)
     Customer_Last_Name = db.Column(db.String(50), nullable=False)
-    Last_name = db.Column(db.String(50), nullable=False)
     Age = db.Column(db.Integer)
     Country = db.Column(db.String(50))
 

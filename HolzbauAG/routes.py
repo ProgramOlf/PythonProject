@@ -14,9 +14,8 @@ from models import Order, Customer
 
 
 
-
-
 bp = Blueprint('holzbauag', __name__)
+
 
 
 
@@ -34,6 +33,18 @@ class OrderForm(FlaskForm):
     Couch = IntegerField('Couch', validators=[DataRequired()])
     Bed = IntegerField('Bed', validators=[DataRequired()])
     Shelf = IntegerField('Shelf', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+
+
+# Create a Class to implement new Customer Data
+class CustomerForm(FlaskForm):
+    Customer_ID = IntegerField('Customer_ID', validators=[DataRequired()])
+    Customer_First_Name = StringField('Customer_First_Name', validators=[DataRequired()])
+    Customer_Last_Name = StringField('Customer_Last_Name', validators=[DataRequired()])
+    Age = IntegerField('Age', validators=[DataRequired()])
+    Country = StringField('Country', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -57,13 +68,13 @@ def home():
 # Routes for Order Data #
 #########################
 
-@bp.route('/order_data2', methods=['GET', 'POST'])
-def order_data2():
+@bp.route('/order_data', methods=['GET', 'POST'])
+def order_data():
     # Retrieve data from the order_data table
     order_data = Order.query.order_by(Order.Order_ID)
     #print(order_data)  # Check if orders are retrieved
     
-    return render_template('order_data2.html', 
+    return render_template('order_data.html', 
                            title='Order Data',
                            order_data=order_data)
 
@@ -119,7 +130,7 @@ def add_order_data():
             flash('Order added successfully!', 'success')
 
             # Redirect to the order_data2 route to clear the form
-            return redirect(url_for('holzbauag.order_data2'))
+            return redirect(url_for('holzbauag.order_data'))
         except Exception as e:
             print(f"Error adding order: {e}")
     else:
@@ -158,7 +169,7 @@ def edit_order(Order_ID):
         db.session.commit()
 
         flash('Order updated successfully!', 'success')
-        return redirect(url_for('holzbauag.order_data2'))
+        return redirect(url_for('holzbauag.order_data'))
     else:
         flash('Form validation failed!', 'error')
 
@@ -174,187 +185,120 @@ def delete_order(order_id):
     db.session.delete(order)
     db.session.commit()
     flash('Order deleted successfully!', 'success')
-    return redirect(url_for('holzbauag.order_data2'))
+    return redirect(url_for('holzbauag.order_data'))
 
 
 
 
 
-@bp.route('/customer-data', methods=['GET', 'POST'], endpoint='customer_data_route')
+#########################
+# Routes for Customer Data #
+#########################
+
+@bp.route('/customer_data', methods=['GET', 'POST'])
 def customer_data():
-    # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('customer_data.csv')
-
-    if request.method == 'POST':
-        action = request.form.get('action')
-
-        if action == 'edit':
-            selected_row_id = request.form.get('row_id')
-
-            if selected_row_id is not None:
-                # Redirect to the edit page with the selected row ID
-                return redirect(url_for('holzbauag.edit_customer_row', row_id=selected_row_id))
-            else:
-                # Handle the case where no row is selected
-                return render_template('error.html', error_message='No row selected')
-
-        elif action == 'save_edit':
-            # Process the form submission for saving the edited data.
-            # Implement the saving logic here.
-
-            # Redirect or render the appropriate page.
-            return redirect(url_for('holzbauag.customer_data_route'))
-        
-    return render_template('customer_data.html', title='Customer Data', data=customer_data)
+    # Retrieve data from the order_data table
+    customer_data = Customer.query.order_by(Customer.Customer_ID)
+    #print(order_data)  # Check if orders are retrieved
+    
+    return render_template('customer_data.html', 
+                           title='Customer Data',
+                           customer_data=customer_data)
 
 
 
 
-@bp.route('/edit-customer-row', methods=['GET','POST'], endpoint='edit_customer_row')
-def edit_customer_row():
-    # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('customer_data.csv')
+@bp.route('/add_customer_data', methods=['GET', 'POST'])
+def add_customer_data():
+    form = CustomerForm()
 
-    # Replace this with your logic to get the selected row index
-    customer_row_index = request.form.get('selected_row_id', type=int)
+    # Query the database to find the highest order_id
+    highest_customer_id = db.session.query(db.func.max(Customer.Customer_ID)).scalar() or 0
+    
+    # Increment the highest order_id by one and pass it to the form
+    form.Customer_ID.data = highest_customer_id + 1
+    
+    if form.validate_on_submit():
+        try:
+            # Create a new Order instance and add it to the database
+            new_customer = Customer(
+                Customer_ID=form.Customer_ID.data, 
+                Customer_First_Name=form.Customer_First_Name.data, 
+                Customer_Last_Name=form.Customer_Last_Name.data, 
+                Age=form.Age.data,
+                Country=form.Country.data
+            )
+            
+            db.session.add(new_customer)
+            db.session.commit()
 
-    if customer_row_index is None:
-        # Handle the case where no row is selected
-        logging.error('No row selected')
-        return render_template('error.html', error_message='No row selected')
+            # Clear form data
+            form.Customer_ID.data = highest_customer_id + 1  # Increment order ID again
+            form.Customer_First_Name.data = ''
+            form.Customer_Last_Name.data = ''
+            form.Age.data = ''
+            form.Country.data = ''
 
-    # Retrieve data for the selected row from your DataFrame
-    customer_row_data = customer_data.loc[customer_row_index].tolist()
+            # Display a flash message to indicate successful order submission
+            flash('Customer added successfully!', 'success')
 
-    # Get the column names to display as headers
-    column_names = customer_data.columns.tolist()
+            # Redirect to the order_data2 route to clear the form
+            return redirect(url_for('holzbauag.customer_data'))
+        except Exception as e:
+            print(f"Error adding customer: {e}")
+    else:
+        print(form.errors)
+        flash('Form validation failed!', 'error')
 
-    # Debugging statements
-    logging.debug(f'Selected Row Index: {customer_row_index}')
-    logging.debug(f'Column Names: {column_names}')
-    logging.debug(f'Selected Row Data: {customer_row_data}')
-
-    return render_template('edit_customer_row.html', title='Edit Row', customer_row_index=customer_row_index, column_names=column_names, customer_row_data=customer_row_data)
-
-
-
-
-@bp.route('/save-customer-edited-row', methods=['POST'])
-def save_customer_edited_row():
-    # Read CSV using pandas
-    customer_data = read_csv_to_dataframe('customer_data.csv')
-
-    if request.method == 'POST':
-        customer_row_index = int(request.form.get('customer_row_index'))
-
-        # Update the selected row data in the DataFrame
-        for key in customer_data.columns:
-            if key == 'date':  # Replace 'date_column' with the actual date column name
-                # Parse the date string into a datetime object
-                date_string = request.form.get('date')
-                parsed_date = datetime.strptime(date_string, "%Y-%m-%d")
-                customer_data.at[customer_row_index, key] = parsed_date
-            else:
-                customer_data.at[customer_row_index, key] = request.form.get(key)
-
-        # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(customer_data, 'customer_data.csv')
-
-        return redirect(url_for('holzbauag.customer_data_route'))
-
-    return redirect(url_for('holzbauag.customer_data_route'))
+    return render_template('add_customer_data.html', title='Add Customer Data', form=form)
 
 
 
 
-@bp.route('/order-data', methods=['GET', 'POST'], endpoint='order_data_route')
-def order_data():
-    # Read CSV using pandas
-    order_data = read_csv_to_dataframe('order_data.csv')
+@bp.route('/edit_customer/<int:Customer_ID>', methods=['GET', 'POST'])
+def edit_customer(Customer_ID):
+    customer = Customer.query.get_or_404(Customer_ID)
+    form = CustomerForm()
 
-    if request.method == 'POST':
-        action = request.form.get('action')
+    if form.validate_on_submit():
+        # Update the order object with the form data
+        customer.Customer_ID = form.Customer_ID.data
+        customer.Customer_First_Name = form.Customer_First_Name.data
+        customer.Customer_Last_Name = form.Customer_Last_Name.data
+        customer.Age = form.Age.data
+        customer.Country = form.Country.data
+    
+        # Update the order object with form data
+        form.populate_obj(customer)  
 
-        if action == 'edit':
-            selected_row_id = request.form.get('row_id')
+        # Commit changes to the database
+        db.session.commit()
 
-            if selected_row_id is not None:
-                # Redirect to the edit page with the selected row ID
-                return redirect(url_for('holzbauag.edit_selected_row', row_id=selected_row_id))
-            else:
-                # Handle the case where no row is selected
-                return render_template('error.html', error_message='No row selected')
+        flash('Customer updated successfully!', 'success')
+        return redirect(url_for('holzbauag.customer_data'))
+    else:
+        flash('Form validation failed!', 'error')
 
-        elif action == 'save_edit':
-            # Process the form submission for saving the edited data.
-            # Implement the saving logic here.
-
-            # Redirect or render the appropriate page.
-            return redirect(url_for('holzbauag.order_data_route'))
-
-    return render_template('order_data.html', 
-                           title='Order Data', 
-                           data=order_data)
+    return render_template('edit_customer.html', form=form, customer=customer)
 
 
 
 
-@bp.route('/edit-selected-row', methods=['POST'], endpoint='edit_selected_row')
-def edit_selected_row():
-    # Read CSV using pandas
-    order_data = read_csv_to_dataframe('order_data.csv')
 
-    # Replace this with your logic to get the selected row index
-    selected_row_index = request.form.get('selected_row_id', type=int)
-
-    if selected_row_index is None:
-        # Handle the case where no row is selected
-        logging.error('No row selected')
-        return render_template('error.html', error_message='No row selected')
-
-    # Retrieve data for the selected row from your DataFrame
-    selected_row_data = order_data.loc[selected_row_index].tolist()
-
-    # Get the column names to display as headers
-    column_names = order_data.columns.tolist()
-
-    # Debugging statements
-    logging.debug(f'Selected Row Index: {selected_row_index}')
-    logging.debug(f'Column Names: {column_names}')
-    logging.debug(f'Selected Row Data: {selected_row_data}')
-
-    return render_template('edit_selected_row.html', title='Edit Row', selected_row_index=selected_row_index, column_names=column_names, selected_row_data=selected_row_data)
+@bp.route('/delete_customer/<int:customer_id>', methods=['GET', 'POST'])
+def delete_customer(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    db.session.delete(customer)
+    db.session.commit()
+    flash('Customer deleted successfully!', 'success')
+    return redirect(url_for('holzbauag.customer_data'))
 
 
 
 
-@bp.route('/save-edited-row', methods=['POST'])
-def save_edited_row():
-    # Read CSV using pandas
-    order_data = read_csv_to_dataframe('order_data.csv')
-
-    if request.method == 'POST':
-        selected_row_index = int(request.form.get('selected_row_index'))
-
-        # Update the selected row data in the DataFrame
-        for key in order_data.columns:
-            if key == 'date':  # Replace 'date_column' with the actual date column name
-                # Parse the date string into a datetime object
-                date_string = request.form.get('date')
-                parsed_date = datetime.strptime(date_string, "%Y-%m-%d")
-                order_data.at[selected_row_index, key] = parsed_date
-            else:
-                order_data.at[selected_row_index, key] = request.form.get(key)
-
-        # Save the updated DataFrame to CSV
-        write_dataframe_to_csv(order_data, 'order_data.csv')
-
-        return redirect(url_for('holzbauag.order_data_route'))
-
-    return redirect(url_for('holzbauag.order_data_route'))
-
-
-
+#############################
+# Routes for Visualizations #
+#############################
 
 @bp.route('/visualizations', methods=['GET'],endpoint='visualizations_route' )
 def visualizations():
