@@ -1,5 +1,5 @@
 import csv
-from flask import Blueprint, render_template, request, redirect, url_for , render_template_string, flash
+from flask import Blueprint, render_template, request, redirect, url_for , render_template_string, flash, abort
 from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv, find_highest_order_id
 import logging
 from datetime import datetime
@@ -53,11 +53,25 @@ def home():
     return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!')
 
 
-
-
+#########################
+# Routes for Order Data #
+#########################
 
 @bp.route('/order_data2', methods=['GET', 'POST'])
 def order_data2():
+    # Retrieve data from the order_data table
+    order_data = Order.query.order_by(Order.Order_ID)
+    #print(order_data)  # Check if orders are retrieved
+    
+    return render_template('order_data2.html', 
+                           title='Order Data',
+                           order_data=order_data)
+
+
+
+
+@bp.route('/add_order_data', methods=['GET', 'POST'])
+def add_order_data():
     form = OrderForm()
 
     # Query the database to find the highest order_id
@@ -68,21 +82,6 @@ def order_data2():
     
     if form.validate_on_submit():
         try:
-            # Print form data for debugging
-            print("Form data:")
-            print(form.Order_ID.data)
-            print(form.Date.data)
-            print(form.Customer_ID.data)
-            print(form.Price.data)
-            print(form.Chair.data)
-            print(form.Stool.data)
-            print(form.Table.data)
-            print(form.Cabinet.data)
-            print(form.Dresser.data)
-            print(form.Couch.data)
-            print(form.Bed.data)
-            print(form.Shelf.data)
-
             # Create a new Order instance and add it to the database
             new_order = Order(
                 Order_ID=form.Order_ID.data, 
@@ -127,15 +126,55 @@ def order_data2():
         print(form.errors)
         flash('Form validation failed!', 'error')
 
-    # Retrieve data from the order_data table
-    order_data = Order.query.order_by(Order.Order_ID)
-    print(order_data)  # Check if orders are retrieved
-    
-    return render_template('order_data2.html', 
-                           title='Order Data', 
-                           form=form,
-                           order_data=order_data)
+    return render_template('add_order_data.html', title='Add Order Data', form=form)
 
+
+
+
+@bp.route('/edit_order/<int:Order_ID>', methods=['GET', 'POST'])
+def edit_order(Order_ID):
+    order = Order.query.get_or_404(Order_ID)
+    form = OrderForm()
+
+    if form.validate_on_submit():
+        # Update the order object with the form data
+        order.Order_ID = form.Order_ID.data
+        order.Date = form.Date.data
+        order.Customer_ID = form.Customer_ID.data
+        order.Price = form.Price.data
+        order.Chair = form.Chair.data
+        order.Stool = form.Stool.data
+        order.Table = form.Table.data
+        order.Cabinet = form.Cabinet.data
+        order.Dresser = form.Dresser.data
+        order.Couch = form.Couch.data
+        order.Bed = form.Bed.data
+        order.Shelf = form.Shelf.data
+    
+        # Update the order object with form data
+        form.populate_obj(order)  
+
+        # Commit changes to the database
+        db.session.commit()
+
+        flash('Order updated successfully!', 'success')
+        return redirect(url_for('holzbauag.order_data2'))
+    else:
+        flash('Form validation failed!', 'error')
+
+    return render_template('edit_order.html', form=form, order=order)
+
+
+
+
+
+@bp.route('/delete_order/<int:order_id>', methods=['GET', 'POST'])
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    db.session.delete(order)
+    db.session.commit()
+    flash('Order deleted successfully!', 'success')
+    return redirect(url_for('holzbauag.order_data2'))
 
 
 
@@ -233,48 +272,6 @@ def order_data():
     # Read CSV using pandas
     order_data = read_csv_to_dataframe('order_data.csv')
 
-    # Find the highest order number and expands it by one
-    highest_order_id = order_data['Order_ID'].astype(int).max() + 1 if not order_data.empty else 1
-
-    # Implements the form into the page
-    order_id = highest_order_id
-    date = None
-    customer_id = None
-    price = None
-    chair = None
-    stool = None
-    table = None
-    cabinet = None
-    dresser = None
-    couch = None
-    shelf = None
-    form = OrderForm()
-
-    # Validates the form to be not none
-    if form.validate_on_submit():
-        order_id = form.order_id.data
-        form.order_id.data = ''
-        date = form.date.data
-        form.date.data = ''
-        customer_id = form.customer_id.data
-        form.customer_id.data = ''
-        price = form.price.data
-        form.price.data = ''
-        chair = form.chair.data
-        form.chair.data = ''
-        stool = form.stool.data
-        form.stool.data = ''
-        table = form.table.data
-        form.table.data = ''
-        dresser = form.dresser.data
-        form.dresser.data = ''
-        couch = form.couch.data
-        form.couch.data = ''
-        shelf = form.shelf.data
-        form.shelf.data = ''
-        
-
-
     if request.method == 'POST':
         action = request.form.get('action')
 
@@ -297,19 +294,7 @@ def order_data():
 
     return render_template('order_data.html', 
                            title='Order Data', 
-                           data=order_data,
-                           order_id = order_id,
-                           date = date,
-                           customer_id = customer_id,
-                           price = price,
-                           chair = chair,
-                           stool = stool,
-                           table = table,
-                           cabinet = cabinet,
-                           dresser = dresser,
-                           couch = couch,
-                           shelf = shelf,
-                           form = form)
+                           data=order_data)
 
 
 
