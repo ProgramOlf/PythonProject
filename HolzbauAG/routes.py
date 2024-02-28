@@ -50,24 +50,17 @@ class CustomerForm(FlaskForm):
 
 
 
-def read_csv(filename):
-    with open(filename, 'r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        data = list(reader)
-    return data
-
-
-
-
+# Display of the homepage
 @bp.route('/')
 def home():
-    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!')
+    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!', content2='Navigate the page to work with the customer and order data.', content3 ='\Additionally, you can analyse the data in Top Customers and visualize data in Visualizations!')
 
 
 #########################
 # Routes for Order Data #
 #########################
 
+# Display the Order Data
 @bp.route('/order_data', methods=['GET', 'POST'])
 def order_data():
     # Retrieve data from the order_data table
@@ -81,6 +74,7 @@ def order_data():
 
 
 
+# Adding of Order Data in a new webpage using forms
 @bp.route('/add_order_data', methods=['GET', 'POST'])
 def add_order_data():
     form = OrderForm()
@@ -142,6 +136,7 @@ def add_order_data():
 
 
 
+# Editing existing Data in a new webpage using forms
 @bp.route('/edit_order/<int:Order_ID>', methods=['GET', 'POST'])
 def edit_order(Order_ID):
     order = Order.query.get_or_404(Order_ID)
@@ -179,6 +174,7 @@ def edit_order(Order_ID):
 
 
 
+# Deletion of Data inside the Edit Order Data Page
 @bp.route('/delete_order/<int:order_id>', methods=['GET', 'POST'])
 def delete_order(order_id):
     order = Order.query.get_or_404(order_id)
@@ -191,10 +187,11 @@ def delete_order(order_id):
 
 
 
-#########################
+############################
 # Routes for Customer Data #
-#########################
+############################
 
+# Display the Order Data
 @bp.route('/customer_data', methods=['GET', 'POST'])
 def customer_data():
     # Retrieve data from the order_data table
@@ -208,6 +205,7 @@ def customer_data():
 
 
 
+# Adding of Order Data in a new webpage using forms
 @bp.route('/add_customer_data', methods=['GET', 'POST'])
 def add_customer_data():
     form = CustomerForm()
@@ -255,6 +253,7 @@ def add_customer_data():
 
 
 
+# Editing existing Data in a new webpage using forms
 @bp.route('/edit_customer/<int:Customer_ID>', methods=['GET', 'POST'])
 def edit_customer(Customer_ID):
     customer = Customer.query.get_or_404(Customer_ID)
@@ -285,6 +284,7 @@ def edit_customer(Customer_ID):
 
 
 
+# Deletion of Data inside the Edit Customer Data Page
 @bp.route('/delete_customer/<int:customer_id>', methods=['GET', 'POST'])
 def delete_customer(customer_id):
     customer = Customer.query.get_or_404(customer_id)
@@ -316,6 +316,10 @@ def visualizations():
 
 
 
+
+############################
+# Routes for Top Customers #
+############################
 
 @bp.route('/Top_10/', methods=['GET', 'POST'])
 def top_customer():
