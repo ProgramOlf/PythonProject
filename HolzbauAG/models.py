@@ -14,7 +14,7 @@ class Customer(db.Model):
     orders = db.relationship('Order', backref='customer', lazy=True)
 
     def __repr__(self):
-        return f'<Customer {self.id}>'
+        return f'<Customer {self.Customer_ID}>'
 
 # Define the Order model
 class Order(db.Model):
@@ -33,4 +33,4 @@ class Order(db.Model):
     Shelf = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'<Order {self.id}>'
+        return f'<Order {self.Order_ID}>'
