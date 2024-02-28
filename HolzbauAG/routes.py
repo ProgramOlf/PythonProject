@@ -2,19 +2,28 @@ import csv
 from flask import Blueprint, render_template, request, redirect, url_for , render_template_string, flash, abort
 from csv_pandas import read_csv_to_dataframe, write_dataframe_to_csv, find_highest_order_id
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from visualizations import generate_sales_over_time_chart, generate_furniture_distribution_chart,generate_customer_country_chart,generate_customer_age_chart
 import pandas as pd
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, FloatField, DateField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, NumberRange, ValidationError
 from __init__ import db
 from models import Order, Customer
+from collections import defaultdict
+from recommendations import generate_recommendations
 
 
 
 
 bp = Blueprint('holzbauag', __name__)
+
+
+
+
+def not_empty(form, field):
+    if field.data is None or field.data == '':
+        raise ValidationError('This field cannot be empty')
 
 
 
@@ -25,17 +34,15 @@ class OrderForm(FlaskForm):
     Date = DateField('Date', validators=[DataRequired()])
     Customer_ID = IntegerField('Customer_ID', validators=[DataRequired()])
     Price = FloatField('Price', validators=[DataRequired()])
-    Chair = IntegerField('Chair', validators=[DataRequired()])
-    Stool = IntegerField('Stool', validators=[DataRequired()])
-    Table = IntegerField('Table', validators=[DataRequired()])
-    Cabinet = IntegerField('Cabinet', validators=[DataRequired()])
-    Dresser = IntegerField('Dresser', validators=[DataRequired()])
-    Couch = IntegerField('Couch', validators=[DataRequired()])
-    Bed = IntegerField('Bed', validators=[DataRequired()])
-    Shelf = IntegerField('Shelf', validators=[DataRequired()])
+    Chair = IntegerField('Chair', validators=[not_empty, NumberRange(min=0)])
+    Stool = IntegerField('Stool', validators=[not_empty, NumberRange(min=0)])
+    Table = IntegerField('Table', validators=[not_empty, NumberRange(min=0)])
+    Cabinet = IntegerField('Cabinet', validators=[not_empty, NumberRange(min=0)])
+    Dresser = IntegerField('Dresser', validators=[not_empty, NumberRange(min=0)])
+    Couch = IntegerField('Couch', validators=[not_empty, NumberRange(min=0)])
+    Bed = IntegerField('Bed', validators=[not_empty, NumberRange(min=0)])
+    Shelf = IntegerField('Shelf', validators=[not_empty, NumberRange(min=0)])
     submit = SubmitField('Submit')
-
-
 
 
 # Create a Class to implement new Customer Data
@@ -46,6 +53,7 @@ class CustomerForm(FlaskForm):
     Age = IntegerField('Age', validators=[DataRequired()])
     Country = StringField('Country', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
 
 
 
@@ -106,6 +114,15 @@ def add_order_data():
             db.session.add(new_order)
             db.session.commit()
 
+            # Generate recommendations based on the new order
+            recommendations = generate_recommendations(new_order)
+
+            # Concatenate recommendations into a single message
+            recommendation_message = "<br>".join(recommendations.values())
+
+            # Display a flash message with recommendations
+            flash(recommendation_message, 'info')
+
             # Clear form data
             form.Order_ID.data = highest_order_id + 1  # Increment order ID again
             form.Date.data = ''
@@ -123,15 +140,19 @@ def add_order_data():
             # Display a flash message to indicate successful order submission
             flash('Order added successfully!', 'success')
 
-            # Redirect to the order_data2 route to clear the form
+            # Redirect to the order_data route to clear the form
             return redirect(url_for('holzbauag.order_data'))
         except Exception as e:
             print(f"Error adding order: {e}")
+            flash('Error adding order. Please try again later.', 'error')
     else:
         print(form.errors)
         flash('Form validation failed!', 'error')
 
     return render_template('add_order_data.html', title='Add Order Data', form=form)
+
+
+
 
 
 
@@ -409,159 +430,122 @@ def top_customer():
 
 
 
+##########
+# Task 5 #
+##########
 '''
-# Task 5
-# 8 Marketing campaigns for Holzbau GmbH have been created to activate the customer basis
+# 7 Marketing campaigns for Holzbau GmbH have been created to activate the customer basis
 # 5.1 New Years Marketing Campaign
-# Read customer data
-customer_data = pd.read_csv('customer_data.csv')
-
-# Extract customer IDs of all customers
-all_customer_ids = customer_data['Customer_ID'].unique()
+# Query all customers from the database
+all_customers = Customer.query.all()
 
 # Send marketing email to all customers
-for customer_id in all_customer_ids:
-    print(f"Sending marketing email to customer ID {customer_id}:")
+for customer in all_customers:
+    print(f"Sending marketing email to customer ID {customer.Customer_ID}:")
     print("Happy New Year from Holzbau!\nStart the year off right with our exclusive New Year's discount event.\nEnjoy up to 30% off on our stylish furniture collections and elevate your home decor for a fresh start in 2024\n")
-    
 
 # 5.2 Spring Marketing Campaign
-import pandas as pd
-# Read customer data
-customer_data = pd.read_csv('customer_data.csv')
-
-# Extract customer IDs of all customers
-all_customer_ids = customer_data['Customer_ID'].unique()
+# Query all customers from the database
+all_customers = Customer.query.all()
 
 # Send marketing email to all customers
-for customer_id in all_customer_ids:
-    print(f"Sending marketing email to customer ID {customer_id}:")
+for customer in all_customers:
+    print(f"Sending marketing email to customer ID {customer.Customer_ID}:")
     print("Super spring savings are here!\nComplete your dream home makeover today! Explore our wide selection of stylish furniture pieces at unbeatable prices. Don't miss out – shop now and elevate your living space with comfort and elegance. Use code SPRING24 at checkout for a 30% discount.\n")
- 
+
 
 # 5.3 Special Marketing Strategies per Country
 # 5.3.1 USA Marketing Campaign
-
-import pandas as pd
-
-# Load customer data from CSV file
-customer_data = pd.read_csv('customer_data.csv')
-
-# Filter customers from the USA
-usa_customers = customer_data[customer_data['Country'] == 'USA']
+# Query customers from the USA from the database
+usa_customers = Customer.query.filter_by(Country='USA').all()
 
 # Print the 4th of July sale message for USA customers
-for index, customer in usa_customers.iterrows():
+for customer in usa_customers:
     print("Deck out your home in style this Fourth of July with our spectacular sale at Holzbau GmbH! Celebrate Independence Day with huge discounts on a wide range of furniture, from cozy couches to elegant dining tables. Don't miss this chance to create an inviting space for your family and friends to gather and celebrate! Use code 4JULY at checkout. Happy Shopping!")
 
 
+
 # 5.3.2 France Marketing Campaign
-import pandas as pd
+# Query customers from the USA from the database
+usa_customers = Customer.query.filter_by(Country='USA').all()
 
-# Load customer data from CSV file
-customer_data = pd.read_csv('customer_data.csv')
-
-# Filter customers from the USA
-usa_customers = customer_data[customer_data['Country'] == 'France']
-
-# Print the Bastille day sale message for French customers
-for index, customer in usa_customers.iterrows():
+# Print the 4th of July sale message for USA customers
+for customer in usa_customers:
     print("Celebrate Bastille day with us!\nEnjoy 30% off on all our furniture to make your home even more beautiful.\nOffer valid only for our customers in France - don't miss out on this special occasion!\n")
 
 # 5.4 Holzbau GmbH's Birthday Marketing Campaign
+# Get the current date
+current_date = datetime.now().date()
 
-import pandas as pd
+# Query customers with a birthday today from the database
+customers_with_birthday_today = Customer.query.filter(
+    db.extract('month', Customer.birthdate) == current_date.month,
+    db.extract('day', Customer.birthdate) == current_date.day
+).all()
 
-# Read customer data
-customer_data = pd.read_csv('customer_data.csv')
+# Send marketing email to customers with a birthday today
+for customer in customers_with_birthday_today:
+    print(f"Sending marketing email to customer ID {customer.Customer_ID}:")
+    print("Happy Birthday from Holzbau GmbH!\nWishing you a fantastic day filled with joy and happiness. As a token of our appreciation, enjoy a special birthday discount on your next purchase!\n")
 
-# Extract customer IDs of all customers
-all_customer_ids = customer_data['Customer_ID'].unique()
-
-# Send marketing email to all customers
-for customer_id in all_customer_ids:
-    print(f"Sending marketing email to customer ID {customer_id}:")
-    print("Join us in celebrating Holzbau GmbH's 20th anniversary!\nTo mark this milestone, we're offering an exclusive 20% discount on all furniture items.\nDon't miss out on this opportunity to spruce up your home with quality pieces at unbeatable prices.\n")
- 
 # 5.5 Black Friday Marketing Campaign
+# Get the current date
+current_date = datetime.now().date()
 
-import pandas as pd
+# Calculate the date of Black Friday for the current year
+year = current_date.year
+black_friday_date = None
 
-# Read customer data
-customer_data = pd.read_csv('customer_data.csv')
+# Black Friday is the fourth Friday of November
+for day in range(23, 30):
+    date = datetime(year, 11, day)
+    if date.weekday() == 4:  # Friday
+        black_friday_date = date
+        break
 
-# Extract customer IDs of all customers
-all_customer_ids = customer_data['Customer_ID'].unique()
+# If Black Friday is today, send marketing email
+if current_date == black_friday_date:
+    # Read customer data
+    customer_data = pd.read_csv('customer_data.csv')
 
-# Send marketing email to all customers
-for customer_id in all_customer_ids:
-    print(f"Sending marketing email to customer ID {customer_id}:")
-    print("Black Friday week at Holzbau GmbH\nUnlock unbeatable savings this Black Friday week at Holzbau GmbH!\nFrom luxurious couches to sleek dining sets, indulge in our exclusive discounts and elevate your home decor.\nHurry, seize the opportunity to transform your living space into a haven of style and comfort at prices you won't believe. Up to 50% off. Shop the sale\n")
+    # Extract customer IDs of all customers
+    all_customer_ids = customer_data['Customer_ID'].unique()
+
+    # Send marketing email to all customers
+    for customer_id in all_customer_ids:
+        print(f"Sending marketing email to customer ID {customer_id}:")
+        print("Black Friday week at Holzbau GmbH\nUnlock unbeatable savings this Black Friday week at Holzbau GmbH!\nFrom luxurious couches to sleek dining sets, indulge in our exclusive discounts and elevate your home decor.\nHurry, seize the opportunity to transform your living space into a haven of style and comfort at prices you won't believe. Up to 50% off. Shop the sale\n")
 
 # 5.6 Christmas Marketing Campaign
-# Read customer data
-customer_data = pd.read_csv('customer_data.csv')
+# Get the current date
+current_date = datetime.now().date()
 
-# Extract customer IDs of all customers
-all_customer_ids = customer_data['Customer_ID'].unique()
+# Check if today is Christmas Eve (December 24th)
+if current_date.month == 12 and current_date.day == 24:
+    # Read customer data
+    customer_data = pd.read_csv('customer_data.csv')
 
-# Send marketing email to all customers
-for customer_id in all_customer_ids:
-    print(f"Sending marketing email to customer ID {customer_id}:")
-    print("Christmas Sale\nAs the holiday season draws near, we at Holzbau are thrilled to invite you to elevate your festive celebrations with our exquisite furniture offerings.\nFrom cozy sofas to elegant dining sets, we have everything you need to transform your home into a winter wonderland of comfort and style.\nThis Christmas, give the gift of luxury and warmth with our curated selection of timeless pieces.\nWhether you're hosting a grand feast or cozying up by the fireplace, our furniture is designed to create unforgettable moments with your loved ones.\nAs a token of our appreciation for your continued support, we're delighted to offer you an exclusive discount code: XMASJOY20. Use it at checkout to enjoy extra savings on your holiday purchases.\nVisit our website or drop by our showroom to explore our enchanting collection and discover the perfect pieces to make your holiday season truly magical.\n")
+    # Extract customer IDs of all customers
+    all_customer_ids = customer_data['Customer_ID'].unique()
+
+    # Send marketing email to all customers
+    for customer_id in all_customer_ids:
+        print(f"Sending marketing email to customer ID {customer_id}:")
+        print("Christmas Sale\nAs the holiday season draws near, we at Holzbau are thrilled to invite you to elevate your festive celebrations with our exquisite furniture offerings.\nFrom cozy sofas to elegant dining sets, we have everything you need to transform your home into a winter wonderland of comfort and style.\nThis Christmas, give the gift of luxury and warmth with our curated selection of timeless pieces.\nWhether you're hosting a grand feast or cozying up by the fireplace, our furniture is designed to create unforgettable moments with your loved ones.\nAs a token of our appreciation for your continued support, we're delighted to offer you an exclusive discount code: XMASJOY20. Use it at checkout to enjoy extra savings on your holiday purchases.\nVisit our website or drop by our showroom to explore our enchanting collection and discover the perfect pieces to make your holiday season truly magical.\n")
 
 # 5.7 Customer Loyalty Marketing Campaign (Email 2 months after their last purchase) 
+# Get the current date
+current_date = datetime.now().date()
 
-# 5.8 Customers Sign-Up Birthday Marketing Campaign
+# Calculate the date two months ago
+two_months_ago = current_date - timedelta(days=60)
 
-# Task 6
-import csv
+# Query customers and their last order date from the database
+customers_last_order_dates = db.session.query(Customer, db.func.max(Order.Date)).join(Order).group_by(Customer).all()
 
-# Understand purchase history
-def read_purchase_history(order_data_file):
-    purchase_history = {}
-    with open(order_data_file, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            Customer_ID = row['Customer_ID']
-            purchase_info = {key: int(value) for key, value in row.items() if key != 'Customer ID' and key != 'Date'}
-            purchase_history[Customer_ID] = purchase_info
-    return purchase_history
-
-# Recommendations for their next purchase
-def recommend_next_purchase(purchase_history):
-    recommendations = {}
-    for Customer_ID, purchases in purchase_history.items():
-        chair_count = purchases.get('Chair', 0)
-        stool_count = purchases.get('Stool', 0)
-        table_count = purchases.get('Table', 0)
-        cabinet_count = purchases.get('Cabinet', 0)
-        dresser_count = purchases.get('Dresser', 0)
-        couch_count = purchases.get('Couch', 0)
-        bed_count = purchases.get('Bed', 0)
-        shelf_count = purchases.get('Shelf', 0)
-
-        if chair_count > 2:
-            recommendations[Customer_ID] = "You've purchased more than 2 chairs. Consider adding a table to complete your dining set."
-        elif stool_count > 1:
-            recommendations[Customer_ID] = "You've purchased more than 1 stool. Adding another stool or a table could enhance your space."
-        elif bed_count > 0 and dresser_count == 0:
-            recommendations[Customer_ID] = "You've purchased a bed but no dresser. A dresser could complement your bedroom setup."
-        elif couch_count > 0 and table_count == 0:
-            recommendations[Customer_ID] = "You've purchased a couch but no table. Consider adding a coffee table to complete your living room ensemble."
-        else:
-            recommendations[Customer_ID] = "Based on your purchase history, we recommend exploring our wide range of furniture pieces to find your next perfect addition."
-    return recommendations
-
-# Purchase history and recommendations
-order_data_file = 'order_data.csv'
-purchase_history = read_purchase_history(order_data_file)
-recommendations = recommend_next_purchase(purchase_history)
-
-# Print recommendations for each customer
-for Customer_ID, recommendation in recommendations.items():
-    print(f"Customer ID: {Customer_ID}")
-    print(f"Recommendation: {recommendation}\n")
-
- '''   
-   
+# Send message to customers whose last order was two months ago or earlier
+for customer, last_order_date in customers_last_order_dates:
+    if last_order_date and last_order_date <= two_months_ago:
+        print(f"Sending message to customer ID {customer.Customer_ID}:")
+        print("Dear valued customer,\nIt's been two months since your last purchase with us. We hope you've been enjoying your furniture!\nAs a token of our appreciation, we're pleased to offer you an exclusive discount on your next purchase.\nVisit our website or showroom to explore our latest collections and use code THANKYOU20 at checkout for extra savings.\nWe look forward to serving you again soon!\n")
+'''
