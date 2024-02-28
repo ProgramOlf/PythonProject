@@ -5,13 +5,11 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
-    <!-- Button to add new order data -->
-    <a href="{{ url_for('holzbauag.add_order_data') }}" class="btn btn-dark">Add Order Data</a>
+    <h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
     <!-- Display order_data table -->
     <div class="container mt-5">
-        <table class="table">
-            <thead>
+        <table class="table table-hover table-sm">
+            <thead class="thead-light">
                 <tr>
                     <th>Order ID</th>
                     <th>Date</th>
@@ -30,6 +28,11 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Empty row for add data button -->
+                <tr>
+                    <td colspan="12"></td> <!-- span across all columns -->
+                    <td><a href="{{ url_for('holzbauag.add_order_data') }}" class="btn btn-outline-success btn-sm">Add Data</a></td>
+                </tr>
                 {% for order in order_data %}
                 <tr>
                     <td>{{ order.Order_ID }}</td>
@@ -44,11 +47,15 @@
                     <td>{{ order.Couch }}</td>
                     <td>{{ order.Bed }}</td>
                     <td>{{ order.Shelf }}</td>
-                    <td><a href="/edit_order/{{ order.Order_ID }}">Edit</a></td>
+                    <td><a href="/edit_order/{{ order.Order_ID }}" class="btn btn-outline-dark btn-sm">Edit Row</a></td>
                     <!-- Add other table data as needed -->
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <footer>
+        <p>&copy; 2024 Holzbau AG. All rights reserved.</p>
+    </footer>
 {% endblock %}
+

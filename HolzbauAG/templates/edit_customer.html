@@ -3,42 +3,71 @@
 {% block title %} Edit Customer Data Page {% endblock %}
 
 {% block content %}
-    <h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
+<h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
 
-    <!-- Form -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <form action="/edit_customer/{{ customer.Customer_ID }}" method="post">
-                    {{ form.csrf_token }}
-                    <div class="form-group">
-                        <label for="Cusomter_ID">Customer ID</label>
-                        <input type="text" id="Customer_ID" name="Customer_ID" class="form-control" value="{{ customer.Customer_ID }}">
+<!-- Form -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="/edit_customer/{{ customer.Customer_ID }}" method="post" class="needs-validation" novalidate>
+                {{ form.csrf_token }}
+
+                <!-- Customer ID Field -->
+                <div class="form-group">
+                    <label for="Customer_ID">Customer ID</label>
+                    <input type="text" id="Customer_ID" name="Customer_ID" class="form-control" value="{{ customer.Customer_ID }}" readonly>
+                </div>
+
+                <!-- First Name Field -->
+                <div class="form-group">
+                    <label for="Customer_First_Name">First Name</label>
+                    <input type="text" id="Customer_First_Name" name="Customer_First_Name" class="form-control" value="{{ customer.Customer_First_Name }}">
+                    {% for error in form.Customer_First_Name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Last Name Field -->
+                <div class="form-group">
+                    <label for="Customer_Last_Name">Last Name</label>
+                    <input type="text" id="Customer_Last_Name" name="Customer_Last_Name" class="form-control" value="{{ customer.Customer_Last_Name }}">
+                    {% for error in form.Customer_Last_Name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Age and Country Fields -->
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Age">Age</label>
+                            <input type="text" id="Age" name="Age" class="form-control" value="{{ customer.Age }}">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="Customer_First_Name">First Name</label>
-                        <input type="text" id="Customer_First_Name" name="Customer_First_Name" class="form-control" value="{{ customer.Customer_First_Name }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="Customer_Last_Name">Last Name</label>
-                        <input type="text" id="v" name="Customer_Last_Name" class="form-control" value="{{ customer.Customer_Last_Name }}">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Country">Country</label>
+                            <input type="text" id="Country" name="Country" class="form-control" value="{{ customer.Country }}">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="Age">Age</label>
-                        <input type="text" id="Age" name="Age" class="form-control" value="{{ customer.Age }}">
+
+                <!-- Buttons -->
+                <div class="form-row justify-content-center">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-dark mr-2" onclick="return confirm('Are you sure you want to edit this customer?')">Submit</button>
+                        <a href="/delete_customer/{{ customer.Customer_ID }}" class="btn btn-danger mr-2" onclick="return confirm('Are you sure you want to delete this customer?')">Delete Customer</a>
                     </div>
-                    <div class="form-group">
-                        <label for="Country">Country</label>
-                        <input type="text" id="Country" name="Country" class="form-control" value="{{ customer.Country }}">
+                <div class="form-row justify-content-center">
+                    <div class="col-md-6">
+                        <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
                     </div>
-                    <br/>
-                    <button type="submit" class="btn btn-dark"onclick="return confirm('Are you sure you want to edit this customer?')">Submit</button>
-                    <a href="/delete_customer/{{ customer.Customer_ID }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this customer?')">Delete Customer</a>
-                    <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+</div>
+<footer class="mt-5">
+    <p class="text-center">&copy; 2024 Holzbau AG. All rights reserved.</p>
+</footer>
 {% endblock %}

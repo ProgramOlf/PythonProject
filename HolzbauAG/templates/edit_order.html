@@ -3,72 +3,114 @@
 {% block title %} Edit Order Data Page {% endblock %}
 
 {% block content %}
-    <h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
+<h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
 
-    <!-- Form -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <form action="/edit_order/{{ order.Order_ID }}" method="post">
-                    {{ form.csrf_token }}
-                    <div class="form-group">
-                        <label for="Order_ID">Order ID</label>
-                        <input type="text" id="Order_ID" name="Order_ID" class="form-control" value="{{ order.Order_ID }}">
+<!-- Form -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="/edit_order/{{ order.Order_ID }}" method="post" class="needs-validation" novalidate>
+                {{ form.csrf_token }}
+
+                <!-- Order ID Field -->
+                <div class="form-group">
+                    <label for="Order_ID">Order ID</label>
+                    <input type="text" id="Order_ID" name="Order_ID" class="form-control" value="{{ order.Order_ID }}" readonly>
+                </div>
+
+                <!-- Date Field -->
+                <div class="form-group">
+                    <label for="Date">Date</label>
+                    <input type="text" id="Date" name="Date" class="form-control" value="{{ order.Date }}">
+                    {% for error in form.Date.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Customer ID Field -->
+                <div class="form-group">
+                    <label for="Customer_ID">Customer ID</label>
+                    <input type="text" id="Customer_ID" name="Customer_ID" class="form-control" value="{{ order.Customer_ID }}">
+                    {% for error in form.Customer_ID.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Price Field -->
+                <div class="form-group">
+                    <label for="Price">Price</label>
+                    <input type="text" id="Price" name="Price" class="form-control" value="{{ order.Price }}">
+                    {% for error in form.Price.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Product Fields -->
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Chair">Chair</label>
+                            <input type="text" id="Chair" name="Chair" class="form-control" value="{{ order.Chair }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="Stool">Stool</label>
+                            <input type="text" id="Stool" name="Stool" class="form-control" value="{{ order.Stool }}">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="Date">Date</label>
-                        <input type="text" id="Date" name="Date" class="form-control" value="{{ order.Date }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="Customer_ID">Customer ID</label>
-                        <input type="text" id="Customer_ID" name="Customer_ID" class="form-control" value="{{ order.Customer_ID }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="Price">Price</label>
-                        <input type="text" id="Price" name="Price" class="form-control" value="{{ order.Price }}">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Table">Table</label>
+                            <input type="text" id="Table" name="Table" class="form-control" value="{{ order.Table }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="Cabinet">Cabinet</label>
+                            <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ order.Cabinet }}">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="Chair">Chair</label>
-                        <input type="text" id="Chair" name="Chair" class="form-control" value="{{ order.Chair }}">
+
+                <!-- Additional Product Fields -->
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Dresser">Dresser</label>
+                            <input type="text" id="Dresser" name="Dresser" class="form-control" value="{{ order.Dresser }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="Couch">Couch</label>
+                            <input type="text" id="Couch" name="Couch" class="form-control" value="{{ order.Couch }}">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="Stool">Stool</label>
-                        <input type="text" id="Stool" name="Stool" class="form-control" value="{{ order.Stool }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="Table">Table</label>
-                        <input type="text" id="Table" name="Table" class="form-control" value="{{ order.Table }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="Cabinet">Cabinet</label>
-                        <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ order.Cabinet }}">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Bed">Bed</label>
+                            <input type="text" id="Bed" name="Bed" class="form-control" value="{{ order.Bed }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="Shelf">Shelf</label>
+                            <input type="text" id="Shelf" name="Shelf" class="form-control" value="{{ order.Shelf }}">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="Dresser">Dresser</label>
-                        <input type="text" id="Dresser" name="Dresser" class="form-control" value="{{ order.Dresser }}">
+
+                <!-- Buttons -->
+                <div class="form-row justify-content-center">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-dark mr-2" onclick="return confirm('Are you sure you want to edit this order?')">Submit</button>
+                        <a href="/delete_order/{{ order.Order_ID }}" class="btn btn-danger mr-2" onclick="return confirm('Are you sure you want to delete this order?')">Delete Order</a>
                     </div>
-                    <div class="form-group">
-                        <label for="Couch">Couch</label>
-                        <input type="text" id="Couch" name="Couch" class="form-control" value="{{ order.Couch }}">
+                    <div class="form-row justify-content-center">
+                        <div class="col-md-6">
+                            <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="Bed">Bed</label>
-                        <input type="text" id="Bed" name="Bed" class="form-control" value="{{ order.Bed }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="Shelf">Shelf</label>
-                        <input type="text" id="Shelf" name="Shelf" class="form-control" value="{{ order.Shelf }}">
-                    </div>
-                    <br/>
-                    <button type="submit" class="btn btn-dark"onclick="return confirm('Are you sure you want to edit this order?')">Submit</button>
-                    <a href="/delete_order/{{ order.Order_ID }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this order?')">Delete Order</a>
-                    <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+</div>
+<footer class="mt-5">
+    <p class="text-center">&copy; 2024 Holzbau AG. All rights reserved.</p>
+</footer>
 {% endblock %}
+

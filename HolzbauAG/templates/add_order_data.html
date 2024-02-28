@@ -7,69 +7,124 @@
 
 <!-- Form -->
 <div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <form method="post">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post" class="needs-validation" novalidate>
                 {{ form.csrf_token }}
+
+                <!-- Order ID Field -->
                 <div class="form-group">
                     <label for="Order_ID">Order ID</label>
                     <input type="text" id="Order_ID" name="Order_ID" class="form-control" value="{{ form.Order_ID.data }}">
+                    {% for error in form.Order_ID.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
                 </div>
+
+                <!-- Date Field -->
                 <div class="form-group">
                     <label for="Date">Date</label>
                     <input type="text" id="Date" name="Date" class="form-control" value="{{ form.Date.data }}">
+                    {% for error in form.Date.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
                 </div>
+
+                <!-- Customer ID Field -->
                 <div class="form-group">
                     <label for="Customer_ID">Customer ID</label>
                     <input type="text" id="Customer_ID" name="Customer_ID" class="form-control" value="{{ form.Customer_ID.data }}">
+                    {% for error in form.Customer_ID.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
                 </div>
+
+                <!-- Price Field -->
                 <div class="form-group">
                     <label for="Price">Price</label>
                     <input type="text" id="Price" name="Price" class="form-control" value="{{ form.Price.data }}">
+                    {% for error in form.Price.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="Chair">Chair</label>
-                    <input type="text" id="Chair" name="Chair" class="form-control" value="{{ form.Chair.data }}">
+
+                <!-- Additional Fields -->
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <!-- Chair Field -->
+                        <div class="form-group">
+                            <label for="Chair">Chair</label>
+                            <input type="text" id="Chair" name="Chair" class="form-control" value="{{ form.Chair.data }}">
+                        </div>
+
+                        <!-- Stool Field -->
+                        <div class="form-group">
+                            <label for="Stool">Stool</label>
+                            <input type="text" id="Stool" name="Stool" class="form-control" value="{{ form.Stool.data }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Table Field -->
+                        <div class="form-group">
+                            <label for="Table">Table</label>
+                            <input type="text" id="Table" name="Table" class="form-control" value="{{ form.Table.data }}">
+                        </div>
+
+                        <!-- Cabinet Field -->
+                        <div class="form-group">
+                            <label for="Cabinet">Cabinet</label>
+                            <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ form.Cabinet.data }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="Stool">Stool</label>
-                    <input type="text" id="Stool" name="Stool" class="form-control" value="{{ form.Stool.data }}">
+
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <!-- Dresser Field -->
+                        <div class="form-group">
+                            <label for="Dresser">Dresser</label>
+                            <input type="text" id="Dresser" name="Dresser" class="form-control" value="{{ form.Dresser.data }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Couch Field -->
+                        <div class="form-group">
+                            <label for="Couch">Couch</label>
+                            <input type="text" id="Couch" name="Couch" class="form-control" value="{{ form.Couch.data }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="Table">Table</label>
-                    <input type="text" id="Table" name="Table" class="form-control" value="{{ form.Table.data }}">
+
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <!-- Bed Field -->
+                        <div class="form-group">
+                            <label for="Bed">Bed</label>
+                            <input type="text" id="Bed" name="Bed" class="form-control" value="{{ form.Bed.data }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Shelf Field -->
+                        <div class="form-group">
+                            <label for="Shelf">Shelf</label>
+                            <input type="text" id="Shelf" name="Shelf" class="form-control" value="{{ form.Shelf.data }}">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="Cabinet">Cabinet</label>
-                    <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ form.Cabinet.data }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="Dresser">Dresser</label>
-                    <input type="text" id="Dresser" name="Dresser" class="form-control" value="{{ form.Dresser.data }}">
-                </div>
-                <div class="form-group">
-                    <label for="Couch">Couch</label>
-                    <input type="text" id="Couch" name="Couch" class="form-control" value="{{ form.Couch.data }}">
-                </div>
-                <div class="form-group">
-                    <label for="Bed">Bed</label>
-                    <input type="text" id="Bed" name="Bed" class="form-control" value="{{ form.Bed.data }}">
-                </div>
-                <div class="form-group">
-                    <label for="Shelf">Shelf</label>
-                    <input type="text" id="Shelf" name="Shelf" class="form-control" value="{{ form.Shelf.data }}">
-                </div>
+
                 <br/>
                 <button type="submit" class="btn btn-dark">Submit</button>
                 <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
-            </div>
+            </form>
         </div>
     </div>
 </div>
+<footer class="mt-5">
+    <p class="text-center">&copy; 2024 Holzbau AG. All rights reserved.</p>
+</footer>
 {% endblock %}
 
 

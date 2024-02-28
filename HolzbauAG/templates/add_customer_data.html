@@ -7,39 +7,62 @@
 
 <!-- Form -->
 <div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <form method="post">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post" class="needs-validation" novalidate>
                 {{ form.csrf_token }}
+
+                <!-- Customer ID Field -->
                 <div class="form-group">
                     <label for="Customer_ID">Customer ID</label>
                     <input type="text" id="Customer_ID" name="Customer_ID" class="form-control" value="{{ form.Customer_ID.data }}">
                 </div>
+
+                <!-- First Name Field -->
                 <div class="form-group">
                     <label for="Customer_First_Name">First Name</label>
                     <input type="text" id="Customer_First_Name" name="Customer_First_Name" class="form-control" value="{{ form.Customer_First_Name.data }}">
+                    {% for error in form.Customer_First_Name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
                 </div>
+
+                <!-- Last Name Field -->
                 <div class="form-group">
                     <label for="Customer_Last_Name">Last Name</label>
                     <input type="text" id="Customer_Last_Name" name="Customer_Last_Name" class="form-control" value="{{ form.Customer_Last_Name.data }}">
+                    {% for error in form.Customer_Last_Name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="Age">Age</label>
-                    <input type="text" id="Age" name="Age" class="form-control" value="{{ form.Age.data }}">
+
+                <!-- Age and Country Fields -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Age">Age</label>
+                        <input type="text" id="Age" name="Age" class="form-control" value="{{ form.Age.data }}">
+                        {% for error in form.Age.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Country">Country</label>
+                        <input type="text" id="Country" name="Country" class="form-control" value="{{ form.Country.data }}">
+                        {% for error in form.Country.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="Country">Country</label>
-                    <input type="text" id="Country" name="Country" class="form-control" value="{{ form.Country.data }}">
-                </div>
+
                 <br/>
                 <button type="submit" class="btn btn-dark">Submit</button>
                 <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
-            </div>
+            </form>
         </div>
     </div>
 </div>
+<footer class="mt-5">
+    <p class="text-center">&copy; 2024 Holzbau AG. All rights reserved.</p>
+</footer>
 {% endblock %}
-
 
