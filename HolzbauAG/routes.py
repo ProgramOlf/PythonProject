@@ -316,35 +316,84 @@ def visualizations():
 
 
 
+
 @bp.route('/Top_10/', methods=['GET', 'POST'])
 def top_customer():
-    file_path_1 = 'order_data.csv'
-    file_path_2 = 'customer_data.csv'
+    # Query the database to get the required data
+    merged_data = db.session.query(Order, Customer).join(Customer, Order.Customer_ID == Customer.Customer_ID).all()
 
-    order_csv = read_csv_to_dataframe(file_path_1)
-    customer_csv = read_csv_to_dataframe(file_path_2)
+    # Extract relevant data and calculate additional metrics
+    merged_data_list = []
+    for order, customer in merged_data:
+        merged_data_list.append({
+            'Customer_ID': customer.Customer_ID,
+            'Customer_First_Name': customer.Customer_First_Name,
+            'Customer_Last_Name': customer.Customer_Last_Name,
+            'Age': customer.Age,
+            'Country': customer.Country,
+            'Price': order.Price,
+            'Chair': order.Chair,
+            'Stool': order.Stool,
+            'Table': order.Table,
+            'Cabinet': order.Cabinet,
+            'Dresser': order.Dresser,
+            'Couch': order.Couch,
+            'Bed': order.Bed,
+            'Shelf': order.Shelf
+        })
 
-    merged_df = pd.merge(order_csv, customer_csv, on='Customer_ID')
+    merged_df = pd.DataFrame(merged_data_list)
+
+    # Calculate additional metrics
     merged_df['Total_Products'] = merged_df[['Chair', 'Stool', 'Table', 'Cabinet', 'Dresser', 'Couch', 'Bed', 'Shelf']].sum(axis=1)
 
-    customer_id_column = merged_df.columns[merged_df.columns.str.contains('Customer_ID')].tolist()
-    if not customer_id_column:
-        raise ValueError("Customer ID column not found in the DataFrame.")
+    top_10_products = merged_df.groupby('Customer_ID')['Total_Products'].sum().nlargest(10).reset_index(name='Total_Products')
+    top_10_money = merged_df.groupby('Customer_ID')['Price'].sum().nlargest(10).reset_index(name='Total_Spending')
 
-    top_10_products = merged_df.groupby(customer_id_column)['Total_Products'].sum().nlargest(10).reset_index(name='Total_Products')
-    top_10_money = merged_df.groupby(customer_id_column)['Price'].sum().nlargest(10).reset_index(name='Total_Spending')
+    most_orders_customer_id = merged_df.groupby('Customer_ID')['Total_Products'].sum().idxmax()
+    most_spending_customer_id = merged_df.groupby('Customer_ID')['Price'].sum().idxmax()
 
-    most_orders_customer_id = merged_df.groupby(customer_id_column)['Total_Products'].sum().idxmax()
-    most_spending_customer_id = merged_df.groupby(customer_id_column)['Price'].sum().idxmax()
+    top_customer_orders_info = merged_df[merged_df['Customer_ID'] == most_orders_customer_id].copy()
+    top_customer_orders_info['Total_Products'] = merged_df[merged_df['Customer_ID'] == most_orders_customer_id]['Total_Products'].sum()
 
-    top_customer_orders_info = customer_csv.loc[customer_csv[customer_id_column[0]] == most_orders_customer_id].copy()
-    top_customer_orders_info.loc[:, 'Total_Products'] = merged_df.loc[merged_df[customer_id_column[0]] == most_orders_customer_id, 'Total_Products'].sum()
+    top_customer_spending_info = merged_df[merged_df['Customer_ID'] == most_spending_customer_id].copy()
+    top_customer_spending_info['Total_Spending'] = merged_df[merged_df['Customer_ID'] == most_spending_customer_id]['Price'].sum()
 
-    top_customer_spending_info = customer_csv.loc[customer_csv[customer_id_column[0]] == most_spending_customer_id].copy()
-    top_customer_spending_info.loc[:, 'Total_Spending'] = merged_df.loc[merged_df[customer_id_column[0]] == most_spending_customer_id, 'Price'].sum()
+    # Merge with Customer model DataFrame
+    # Extracting required columns from the query result
+    customers_query_result = Customer.query.with_entities(Customer.Customer_ID, Customer.Customer_First_Name, Customer.Customer_Last_Name, Customer.Age, Customer.Country).all()
 
-    top_10_customers_products = pd.merge(top_10_products, customer_csv, on='Customer_ID').sort_values(by='Total_Products', ascending=False)
-    top_10_customers_money = pd.merge(top_10_money, customer_csv, on='Customer_ID').sort_values(by='Total_Spending', ascending=False)
+    # Constructing DataFrames with required columns
+    customers_df = pd.DataFrame(customers_query_result, columns=['Customer_ID', 'Customer_First_Name', 'Customer_Last_Name', 'Age', 'Country'])
+
+    # Merging with top_10_products
+    top_10_customers_products = pd.merge(top_10_products, customers_df, on='Customer_ID').sort_values(by='Total_Products', ascending=False)
+    
+    # Filter the data for the top customer based on most_orders_customer_id
+    top_customer_orders_info = merged_df[merged_df['Customer_ID'] == most_orders_customer_id].copy()
+
+    # Calculate the total products for the top customer
+    top_customer_total_products = top_customer_orders_info['Total_Products'].sum()
+
+    # Keep only one row for the top customer
+    top_customer_orders_info = top_customer_orders_info.iloc[[0]].copy()
+    top_customer_orders_info['Total_Products'] = top_customer_total_products
+
+    
+    # Merging with top_10_money
+    top_10_customers_money = pd.merge(top_10_money, customers_df, on='Customer_ID').sort_values(by='Total_Spending', ascending=False)
+    
+    # Filter the data for the top spending customer based on most_spending_customer_id
+    top_customer_spending_info = merged_df[merged_df['Customer_ID'] == most_spending_customer_id].copy()
+
+    # Calculate the total spending for the top spending customer
+    top_customer_total_spending = top_customer_spending_info['Price'].sum()
+
+    # Keep only one row for the top spending customer
+    top_customer_spending_info = top_customer_spending_info.iloc[[0]].copy()
+    top_customer_spending_info['Total_Spending'] = top_customer_total_spending
+
+
 
     return render_template('Top_10.html',
                            title='Top Customer',
@@ -352,6 +401,7 @@ def top_customer():
                            top_customer_spending_info=top_customer_spending_info.to_dict(orient='records'),
                            top_10_customers_products=top_10_customers_products.to_dict(orient='records'),
                            top_10_customers_money=top_10_customers_money.to_dict(orient='records'))
+
 
 
 
