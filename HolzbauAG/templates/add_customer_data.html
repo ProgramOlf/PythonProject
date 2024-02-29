@@ -22,7 +22,7 @@
                 <!-- First Name Field -->
                 <div class="form-group">
                     <label for="Customer_First_Name">First Name</label>
-                    <input type="text" id="Customer_First_Name" name="Customer_First_Name" class="form-control" value="{{ form.Customer_First_Name.data }}">
+                    <input type="text" id="Customer_First_Name" name="Customer_First_Name" class="form-control" placeholder="Enter First Name" value="{% if form.Customer_First_Name.data %}{{ form.Customer_First_Name.data }}{% endif %}">
                     {% for error in form.Customer_First_Name.errors %}
                     <div class="text-danger">{{ error }}</div>
                     {% endfor %}
@@ -31,7 +31,7 @@
                 <!-- Last Name Field -->
                 <div class="form-group">
                     <label for="Customer_Last_Name">Last Name</label>
-                    <input type="text" id="Customer_Last_Name" name="Customer_Last_Name" class="form-control" value="{{ form.Customer_Last_Name.data }}">
+                    <input type="text" id="Customer_Last_Name" name="Customer_Last_Name" class="form-control" placeholder="Enter Last Name" value="{% if form.Customer_Last_Name.data %}{{ form.Customer_Last_Name.data }}{% endif %}">
                     {% for error in form.Customer_Last_Name.errors %}
                     <div class="text-danger">{{ error }}</div>
                     {% endfor %}
@@ -41,14 +41,14 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="Age">Age</label>
-                        <input type="text" id="Age" name="Age" class="form-control" value="{{ form.Age.data }}">
+                        <input type="text" id="Age" name="Age" class="form-control" placeholder="Enter Age" value="{% if form.Age.data %}{{ form.Age.data }}{% endif %}">
                         {% for error in form.Age.errors %}
                         <div class="text-danger">{{ error }}</div>
                         {% endfor %}
                     </div>
                     <div class="form-group col-md-6">
                         <label for="Country">Country</label>
-                        <input type="text" id="Country" name="Country" class="form-control" value="{{ form.Country.data }}">
+                        <input type="text" id="Country" name="Country" class="form-control" placeholder="Enter Country" value="{% if form.Country.data %}{{ form.Country.data }}{% endif %}">
                         {% for error in form.Country.errors %}
                         <div class="text-danger">{{ error }}</div>
                         {% endfor %}
@@ -56,14 +56,11 @@
                 </div>
 
                 <br/>
-                <button type="submit" class="btn btn-dark">Submit</button>
-                <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
+                <button type="submit" class="btn btn-dark" onclick="return confirm('Are you sure you want to add this customer?')">Submit</button>
+                <a href="{{ url_for('holzbauag.customer_data') }}" class="btn btn-dark back-button">Back</a>
             </form>
         </div>
     </div>
 </div>
-<footer class="mt-5">
-    <p class="text-center">&copy; 2024 Holzbau AG. All rights reserved.</p>
-</footer>
 {% endblock %}
 

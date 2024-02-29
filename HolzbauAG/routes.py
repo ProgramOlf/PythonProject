@@ -28,11 +28,22 @@ def not_empty(form, field):
 
 
 
+# Custom validator for Customer_ID field
+def validate_customer_id(form, field):
+    customer_id = field.data
+    # Check if customer ID exists in the database
+    customer = Customer.query.get(customer_id)
+    if not customer:
+        raise ValidationError('Customer ID does not exist. Please enter a valid Customer ID.')
+
+
+
+
 # Create a Class to implement new Order Data
 class OrderForm(FlaskForm):
     Order_ID = IntegerField('Order_ID', validators=[DataRequired()])
     Date = DateField('Date', validators=[DataRequired()])
-    Customer_ID = IntegerField('Customer_ID', validators=[DataRequired()])
+    Customer_ID = IntegerField('Customer_ID', validators=[DataRequired(), validate_customer_id])
     Price = FloatField('Price', validators=[DataRequired()])
     Chair = IntegerField('Chair', validators=[not_empty, NumberRange(min=0)])
     Stool = IntegerField('Stool', validators=[not_empty, NumberRange(min=0)])
@@ -61,7 +72,7 @@ class CustomerForm(FlaskForm):
 # Display of the homepage
 @bp.route('/')
 def home():
-    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!', content2='Navigate the page to work with the customer and order data.', content3 ='\Additionally, you can analyse the data in Top Customers and visualize data in Visualizations!')
+    return render_template('index.html',  title='HolzbauAG', content='Welcome to HolzbauAG!', content2='Navigate the page to work with the customer and order data.', content3 ='Additionally, you can analyse the data in Top Customers and visualize data in Visualizations!')
 
 
 #########################
@@ -147,7 +158,6 @@ def add_order_data():
             flash('Error adding order. Please try again later.', 'error')
     else:
         print(form.errors)
-        flash('Form validation failed!', 'error')
 
     return render_template('add_order_data.html', title='Add Order Data', form=form)
 
@@ -186,8 +196,6 @@ def edit_order(Order_ID):
 
         flash('Order updated successfully!', 'success')
         return redirect(url_for('holzbauag.order_data'))
-    else:
-        flash('Form validation failed!', 'error')
 
     return render_template('edit_order.html', form=form, order=order)
 
@@ -267,7 +275,6 @@ def add_customer_data():
             print(f"Error adding customer: {e}")
     else:
         print(form.errors)
-        flash('Form validation failed!', 'error')
 
     return render_template('add_customer_data.html', title='Add Customer Data', form=form)
 
@@ -296,8 +303,6 @@ def edit_customer(Customer_ID):
 
         flash('Customer updated successfully!', 'success')
         return redirect(url_for('holzbauag.customer_data'))
-    else:
-        flash('Form validation failed!', 'error')
 
     return render_template('edit_customer.html', form=form, customer=customer)
 
