@@ -4,8 +4,6 @@
 
 {% block content %}
 <h1 class="d-flex justify-content-center align-items-center">{{ title }}</h1>
-<!-- Display flash message-->
-{% include "messages.html" %}
 <!-- Form -->
 <div class="container">
     <div class="row justify-content-center">
@@ -53,19 +51,19 @@
                         <!-- Chair Field -->
                         <div class="form-group">
                             <label for="Chair">Chair</label>
-                            <input type="text" id="Chair" name="Chair" class="form-control" value="{{ form.Chair.data }}">
-                            {% for error in form.Chair.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
+                            <input type="text" id="Chair" name="Chair" class="form-control" value="{% if form.Chair.data is not none %}{{ form.Chair.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Chair.errors %}
+                            <div class="text-danger">{{ form.Chair.errors|join(', ') }}</div>
+                            {% endif %}
                         </div>
 
                         <!-- Stool Field -->
                         <div class="form-group">
                             <label for="Stool">Stool</label>
-                            <input type="text" id="Stool" name="Stool" class="form-control" value="{{ form.Stool.data }}">
-                            {% for error in form.Stool.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
+                            <input type="text" id="Stool" name="Stool" class="form-control" value="{% if form.Stool.data is not none %}{{ form.Stool.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Stool.errors %}
+                            <div class="text-danger">{{ form.Stool.errors|join(', ') }}</div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -73,23 +71,70 @@
                         <!-- Table Field -->
                         <div class="form-group">
                             <label for="Table">Table</label>
-                            <input type="text" id="Table" name="Table" class="form-control" value="{{ form.Table.data }}">
-                            {% for error in form.Table.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
+                            <input type="text" id="Table" name="Table" class="form-control" value="{% if form.Table.data is not none %}{{ form.Table.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Table.errors %}
+                            <div class="text-danger">{{ form.Table.errors|join(', ') }}</div>
+                            {% endif %}
                         </div>
 
                         <!-- Cabinet Field -->
                         <div class="form-group">
                             <label for="Cabinet">Cabinet</label>
-                            <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{{ form.Cabinet.data }}">
-                            {% for error in form.Cabinet.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
+                            <input type="text" id="Cabinet" name="Cabinet" class="form-control" value="{% if form.Cabinet.data is not none %}{{ form.Cabinet.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Cabinet.errors %}
+                            <div class="text-danger">{{ form.Cabinet.errors|join(', ') }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <!-- Dresser Field -->
+                        <div class="form-group">
+                            <label for="Dresser">Dresser</label>
+                            <input type="text" id="Dresser" name="Dresser" class="form-control" value="{% if form.Dresser.data is not none %}{{ form.Dresser.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Dresser.errors %}
+                            <div class="text-danger">{{ form.Dresser.errors|join(', ') }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Couch Field -->
+                        <div class="form-group">
+                            <label for="Couch">Couch</label>
+                            <input type="text" id="Couch" name="Couch" class="form-control" value="{% if form.Couch.data is not none %}{{ form.Couch.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Couch.errors %}
+                            <div class="text-danger">{{ form.Couch.errors|join(', ') }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <!-- Bed Field -->
+                        <div class="form-group">
+                            <label for="Bed">Bed</label>
+                            <input type="text" id="Bed" name="Bed" class="form-control" value="{% if form.Bed.data is not none %}{{ form.Bed.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Bed.errors %}
+                            <div class="text-danger">{{ form.Bed.errors|join(', ') }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Shelf Field -->
+                        <div class="form-group">
+                            <label for="Shelf">Shelf</label>
+                            <input type="text" id="Shelf" name="Shelf" class="form-control" value="{% if form.Shelf.data is not none %}{{ form.Shelf.data }}{% else %}0{% endif %}">
+                            {% if form.is_submitted() and form.Shelf.errors %}
+                            <div class="text-danger">{{ form.Shelf.errors|join(', ') }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Buttons -->
                 <div class="form-row justify-content-center">
@@ -99,7 +144,7 @@
                     </div>
                     <div class="form-row justify-content-center">
                         <div class="col-md-6">
-                            <a href="javascript:history.go(-1)" class="btn btn-dark back-button">Back</a>
+                            <a href="{{ url_for('holzbauag.order_data') }}" class="btn btn-dark back-button">Back</a>
                         </div>
                     </div>
                 </div>
@@ -107,8 +152,5 @@
         </div>
     </div>
 </div>
-<footer class="mt-5">
-    <p class="text-center">&copy; 2024 Holzbau AG. All rights reserved.</p>
-</footer>
 {% endblock %}
 
